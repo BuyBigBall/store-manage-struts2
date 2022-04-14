@@ -139,9 +139,12 @@ public class ItemAction extends AppBaseAction{
 	private ActionForward itemList(AppActionMapping appMapping, ItemForm form,
 			HttpServletRequest request) throws DaoException {
 
+		//HttpServletRequest request = (HttpServletRequest) servletRequest;
+		HttpSession session = request.getSession(false);		//yasha
+		
 		ItemService itemService = new ItemService();
 		RegistryMessageDTO messageDTO = new RegistryMessageDTO();
-		form.setSysItemIdList(itemService.getSysItemIdList(form.getSearchItemDTO()));
+		form.setSysItemIdList(itemService.getSysItemIdList(session, form.getSearchItemDTO()));
 		form.setSysItemIdListSize(form.getSysItemIdList().size());
 		form.setPageIdx(0);
 		form.setItemList(itemService.getItemList(form.getSysItemIdList(), form.getPageIdx(), form.getSearchItemDTO()));
@@ -807,6 +810,7 @@ public class ItemAction extends AppBaseAction{
 	private ActionForward itemListDownLoad(AppActionMapping appMapping, ItemForm form,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+		HttpSession session = request.getSession(false);		//yasha
 		long userId = ActionContext.getLoginUserInfo().getUserId();
 		UserService userService = new UserService();
 		form.setMstUserDTO(userService.getUserName(userId));
@@ -880,18 +884,18 @@ public class ItemAction extends AppBaseAction{
 		//商品情報
 		// 現在は使用しない二回目の本番リリース時までに作成する
 		case WebConst.DOWNLOAD_TYPE_CODE1:
-			workBook = exportItemListService.getExportItemInfoList(form.getSearchItemDTO(), workBook, authInfo, sheetNo);
+			workBook = exportItemListService.getExportItemInfoList(session, form.getSearchItemDTO(), workBook, authInfo, sheetNo);
 			fname = "商品詳細情報_" + date + ".xlsx";
 			break;
 		//在庫情報
 		case WebConst.DOWNLOAD_TYPE_CODE2:
-			form.setSysItemIdList(itemService.getSysItemIdList(form.getSearchItemDTO()));
+			form.setSysItemIdList(itemService.getSysItemIdList(session, form.getSearchItemDTO()));
 			workBook = exportItemListService.getExportStockItemInfoList(form.getSysItemIdList(), workBook, sheetNo);
 			fname = "在庫情報_" + date + ".xlsx";
 			break;
 		//価格情報
 		case WebConst.DOWNLOAD_TYPE_CODE3:
-			form.setSysItemIdList(itemService.getSysItemIdList(form.getSearchItemDTO()));
+			form.setSysItemIdList(itemService.getSysItemIdList(session, form.getSearchItemDTO()));
 			workBook = exportItemListService.getExportPriceInfoList(form.getSysItemIdList(), workBook, authInfo, sheetNo);
 			fname = "価格情報_" + date + ".xlsx";
 			break;
@@ -907,9 +911,9 @@ public class ItemAction extends AppBaseAction{
 		//新在庫Excel
 		case WebConst.DOWNLOAD_TYPE_CODE5:
 
-			form.setSysItemIdList(itemService.getSysItemIdList(form.getSearchItemDTO()));
+			form.setSysItemIdList(itemService.getSysItemIdList(session, form.getSearchItemDTO()));
 			sheetNo = 0;
-			workBook = exportItemListService.getExportItemInfoList(form.getSearchItemDTO(), workBook, authInfo, sheetNo);
+			workBook = exportItemListService.getExportItemInfoList(session, form.getSearchItemDTO(), workBook, authInfo, sheetNo);
 			sheetNo = 1;
 			workBook = exportItemListService.getExportStockItemInfoList(form.getSysItemIdList(), workBook, sheetNo);
 			sheetNo = 2;
