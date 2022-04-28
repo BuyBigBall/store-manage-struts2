@@ -4,7 +4,9 @@
  */
 package jp.co.kts.app.common.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 /**
  * M_ユーザー情報を格納します。
  *
@@ -53,10 +55,16 @@ public class MstUserDTO  {
 
 	/** 海外情報閲覧権限 */
 	private String overseasInfoAuth;
-
+	
 	/** 担当者番号 */
 	private String responsibleNo;
-
+	
+	/* ID・PASS削除権限 */
+	private String idPassDelAuth;
+	
+	private List<MstRulesDTO> mstRulesList = new ArrayList<>();
+	
+	private List<MstMasterDTO> mstMasterList = new ArrayList<>();
 	/**
 	 * <p>
 	 * システムユーザーID を返却します。
@@ -347,6 +355,48 @@ public class MstUserDTO  {
 	 */
 	public void setResponsibleNo(String responsibleNo) {
 	    this.responsibleNo = responsibleNo;
+	}
+
+	/**
+	 * @return the mstRulesList
+	 */
+	public List<MstRulesDTO> getMstRulesList() {
+		return mstRulesList;
+	}
+
+	/**
+	 * @param mstRulesList the mstRulesList to set
+	 */
+	public void setMstRulesList(List<MstRulesDTO> mstRulesList) {
+		this.mstRulesList = mstRulesList;
+	}
+
+	/**
+	 * @return the mstMasterList
+	 */
+	public List<MstMasterDTO> getMstMasterList() {
+		return mstMasterList;
+	}
+
+	/**
+	 * @param mstMasterList the mstMasterList to set
+	 */
+	public void setMstMasterList(List<MstMasterDTO> mstMasterList) {
+		this.mstMasterList = mstMasterList;
+	}
+
+	/**
+	 * @return the idPassDelAuth
+	 */
+	public String getIdPassDelAuth() {
+		return idPassDelAuth;
+	}
+
+	/**
+	 * @param idPassDelAuth the idPassDelAuth to set
+	 */
+	public void setIdPassDelAuth(String idPassDelAuth) {
+		this.idPassDelAuth = idPassDelAuth;
 	}
 
 }

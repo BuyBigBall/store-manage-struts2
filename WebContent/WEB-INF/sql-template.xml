@@ -152,6 +152,329 @@
 		AND PASSWORD =
 		${password}
 	</sql-template>
+	<!-- =============== Rules Start ================= -->
+	<sql-template id="SEL_RULES">
+		SELECT
+		RULE_ID
+		,RULE_NAME
+		,DELETE_FLAG
+		FROM
+		MST_RULES
+		WHERE
+			DELETE_FLAG = '0'
+			<if-equals value="0" varName="getListFlg"> 
+			AND RULE_ID =${ruleId} 
+			</if-equals>
+		ORDER BY
+		RULE_ID
+	</sql-template>
+	<sql-template id="SEL_RULES_BY_USERID">
+		SELECT
+		 R.RULE_ID
+		, RULE_NAME
+		, CASE WHEN E.SYS_USER_ID IS NULL THEN 0 ELSE 1 END AS ISVISIBLE
+		FROM
+		MST_RULES AS R 
+		LEFT JOIN (SELECT * FROM MST_EXTRA_USER_RULE WHERE sys_user_id=${sysUserId} AND DEL_FLG = '0') AS E ON E.RULE_ID = R.RULE_ID
+		WHERE R.DELETE_FLAG = '0'
+		GROUP BY R.rule_id , E.sys_user_id
+		ORDER BY R.RULE_ID
+	</sql-template>
+	<sql-template id="SEL_MST_RULE_LIST">
+		SELECT
+		R.RULE_LIST_ID
+		,R.RULE_ID
+		,R.LIST_NAME
+		,R.LIST_ID
+		,R.LIST_PASS
+		,R.LIST_LINK
+		,R.LIST_REMARKS
+		,R.LIST_VISIBLE
+		,R.DEL_FLG
+		,R.CREATE_DATE
+		,R.UPDATE_DATE
+		FROM
+		MST_RULES_LIST AS R
+		WHERE
+		R.DEL_FLG = '0'
+		<if-not-equals value="0" varName="ruleId">
+			AND R.RULE_ID = ${ruleId}
+		</if-not-equals>
+		<if-not-equals value="0" varName="ruleListId">
+			AND R.RULE_LIST_ID = ${ruleListId}
+		</if-not-equals>
+		ORDER BY
+		R.RULE_LIST_ID
+	</sql-template>
+	<sql-template id="SEL_MST_RULE_LIST_BY_USERID">
+		SELECT
+		R.RULE_LIST_ID
+		,R.RULE_ID
+		<!-- ,E.SYS_USER_ID -->
+		,R.LIST_NAME
+		,R.LIST_ID
+		,R.LIST_PASS
+		,R.LIST_LINK
+		,R.LIST_REMARKS
+		,R.LIST_VISIBLE
+		,R.DEL_FLG
+		,R.CREATE_DATE
+		,R.UPDATE_DATE
+		, CASE WHEN E.SYS_USER_ID IS NULL THEN 0 ELSE 1 END AS ISVISIBLE
+		FROM
+		MST_RULES_LIST AS R
+		LEFT JOIN (SELECT * FROM MST_EXTRA_USER_RULE WHERE SYS_USER_ID=${sysUserId} AND DEL_FLG = '0') AS E ON E.RULE_LIST_ID = R.RULE_LIST_ID
+		
+		WHERE
+		R.DEL_FLG = '0'
+		AND R.RULE_ID = ${ruleId}
+		<if-not-equals value="0" varName="ruleListId">
+			AND R.RULE_LIST_ID = ${ruleListId}
+		</if-not-equals>
+		GROUP BY R.RULE_LIST_ID , E.SYS_USER_ID
+		ORDER BY
+		R.RULE_LIST_ID
+	</sql-template>
+	<sql-template id="DELETE_RULE_ITEM">
+		UPDATE
+		MST_RULES
+		SET
+		DELETE_FLAG = '1'
+		,UPDATE_DATE = current_timestamp
+		WHERE
+		RULE_ID = ${ruleId}
+	</sql-template>
+	<sql-template id="DELETE_RULE_LIST_ITEM">
+		UPDATE
+		MST_RULES_LIST
+		SET
+		DEL_FLG = '1'
+		,UPDATE_DATE = current_timestamp
+		WHERE
+		RULE_LIST_ID = ${ruleListId}
+	</sql-template>
+	<sql-template id="DELETE_RULE_LIST_BY_RULEID">
+		UPDATE
+		MST_RULES_LIST
+		SET
+		DEL_FLG = '1'
+		,UPDATE_DATE = current_timestamp
+		WHERE
+		RULE_ID = ${ruleId}
+	</sql-template>
+	<sql-template id="SEL_MAX_RULE_ID">
+		SELECT
+		COALESCE(MAX(RULE_ID),0)
+		FROM
+		MST_RULES
+	</sql-template>
+	
+	<sql-template id="SEL_MAX_RULE_LIST_ID">
+		SELECT
+		COALESCE(MAX(RULE_LIST_ID),0)
+		FROM
+		MST_RULES_LIST
+	</sql-template>
+	
+	<sql-template id="INS_RULE">
+		INSERT INTO
+		MST_RULES(
+		RULE_ID
+		,RULE_NAME
+		,CREATE_DATE
+		,UPDATE_DATE
+		,DELETE_FLAG)
+		VALUES(
+		${ruleId}
+		,${ruleName}
+		,current_timestamp
+		,current_timestamp
+		,'0')
+	</sql-template>
+	<sql-template id="INS_RULE_LIST">
+		INSERT INTO
+		MST_RULES_LIST(
+		RULE_ID
+		,LIST_NAME
+		,LIST_ID
+		,LIST_PASS
+		,LIST_LINK
+		,LIST_REMARKS
+		,CREATE_DATE
+		,UPDATE_DATE
+		,DEL_FLG)
+		VALUES(
+		${ruleId}
+		,${listName}
+		,${listId}
+		,${listPass}
+		,${listLink}
+		,${listRemarks}
+		,current_timestamp
+		,current_timestamp
+		,'0')
+	</sql-template>
+	
+	<sql-template id="UPD_RULE">
+		UPDATE
+		MST_RULES
+		SET
+		RULE_NAME = ${ruleName}
+		,UPDATE_DATE = current_timestamp
+		WHERE
+		RULE_ID = ${ruleID}
+	</sql-template>
+	<sql-template id="UPD_RULE_LIST">
+		UPDATE
+		MST_RULES_LIST
+		SET
+		LIST_NAME = ${listName}
+		,LIST_ID = ${listId}
+		,LIST_PASS = ${listPass}
+		,LIST_REMARKS = ${listRemarks}
+		,LIST_LINK = ${listLink}
+		,UPDATE_DATE = current_timestamp
+		WHERE
+		RULE_LIST_ID = ${ruleListID}
+	</sql-template>
+	<sql-template id="SEL_EXTRA_RULES_BY_USERID">
+		SELECT
+		EXTRA_ID
+		,SYS_USER_ID
+		,RULE_ID
+		FROM
+		MST_EXTRA_USER_RULE
+		WHERE
+			TRUE
+			<if-not-equals value="0" varName="ruleId">
+				AND RULE_ID = ${ruleId}
+			</if-not-equals>
+			<if-not-equals value="0" varName="ruleListId">
+				AND RULE_LIST_ID = ${ruleListId}
+			</if-not-equals>
+			<if-not-equals value="0" varName="sysUserId">
+				AND SYS_USER_ID = ${sysUserId}
+			</if-not-equals>
+		ORDER BY
+		RULE_ID
+	</sql-template>
+	<sql-template id="INS_EXTRA_RULE_BY_USERID">
+		INSERT INTO
+		MST_EXTRA_USER_RULE(
+		SYS_USER_ID
+		,RULE_ID
+		,CREATE_DATE
+		,UPDATE_DATE
+		,RULE_LIST_ID
+		)
+		VALUES(
+		${sysUserId}
+		,${ruleId}
+		,current_timestamp
+		,current_timestamp
+		,${ruleListId}
+		)
+	</sql-template>
+	<sql-template id="DEL_EXTRA_RULE_BY_USERID">
+		UPDATE
+		MST_EXTRA_USER_RULE
+		SET
+		DEL_FLG = '1'
+		WHERE
+		EXTRA_ID = ${extraId}
+	</sql-template>
+	<sql-template id="UPD_EXTRA_RULE_BY_USERID">
+		UPDATE
+		MST_EXTRA_USER_RULE
+		SET
+		DEL_FLG = '0'
+		WHERE
+		EXTRA_ID = ${extraId}
+	</sql-template>
+	<sql-template id="UPD_MAIN_USER_RULE">
+		UPDATE MST_USER SET
+		BTOB_BILL_AUTH = ${btobBillAuth}
+		,OVERSEAS_INFO_AUTH = ${overseasInfoAuth}
+		<!-- ,ID_PASS_DEL_AUTH = ${idPassDelAuth} -->
+		,UPDATE_DATE = current_timestamp
+		,UPDATE_USER_ID = ${updateUserId}
+		WHERE
+		SYS_USER_ID = ${sysUserId}
+	</sql-template>
+	<sql-template id="SEL_MASTER">
+		SELECT
+		MASTER_ID
+		,SYS_USER_ID
+		,USER_LIST_FLG
+		,RULE_LIST_FLG
+		,CORPORATION_LIST_FLG
+		,ACCOUNT_LIST_FLG
+		,CHANNEL_LIST_FLG
+		,WAREHOUSE_LIST_FLG
+		,MAKER_LIST_FLG
+		,SET_ITEM_LIST_FLG
+		,CLIENT_LIST_FLG
+		,DELIVERY_LIST_FLG
+		FROM
+		MST_MASTER
+		WHERE
+			DEL_FLG = '0'
+			AND SYS_USER_ID = ${sysUserId}
+		
+	</sql-template>
+	<sql-template id="INS_MASTER_BY_USER">
+		INSERT INTO
+		MST_MASTER(
+		SYS_USER_ID
+		,USER_LIST_FLG
+		,RULE_LIST_FLG
+		,CORPORATION_LIST_FLG
+		,ACCOUNT_LIST_FLG
+		,CHANNEL_LIST_FLG
+		,WAREHOUSE_LIST_FLG
+		,MAKER_LIST_FLG
+		,SET_ITEM_LIST_FLG
+		,CLIENT_LIST_FLG
+		,DELIVERY_LIST_FLG
+		,DEL_FLG
+		,CREATE_DATE
+		,UPDATE_DATE
+		)
+		VALUES(
+		${sysUserId}
+		,${userListFlg}
+		,${ruleListFlg}
+		,${corporationListFlg}
+		,${accountListFlg}
+		,${channelListFlg}
+		,${warehouseListFlg}
+		,${makerListFlg}
+		,${setItemListFlg}
+		,${clientListFlg}
+		,${deliveryListFlg}
+		,'0'
+		,current_timestamp
+		,current_timestamp
+		)
+	</sql-template>
+	<sql-template id="UPD_MASTER_BY_USER">
+		UPDATE MST_MASTER SET
+		USER_LIST_FLG = ${userListFlg}
+		,RULE_LIST_FLG = ${ruleListFlg}
+		,CORPORATION_LIST_FLG = ${corporationListFlg}
+		,ACCOUNT_LIST_FLG = ${accountListFlg}
+		,CHANNEL_LIST_FLG = ${channelListFlg}
+		,WAREHOUSE_LIST_FLG = ${warehouseListFlg}
+		,MAKER_LIST_FLG = ${makerListFlg}
+		,SET_ITEM_LIST_FLG = ${setItemListFlg}
+		,CLIENT_LIST_FLG = ${clientListFlg}
+		,DELIVERY_LIST_FLG = ${deliveryListFlg}
+		,UPDATE_DATE = current_timestamp
+		WHERE
+		SYS_USER_ID = ${sysUserId}
+	</sql-template>
+	
+	<!-- =============== Rules End =================== -->
 
 	<sql-template id="SEL_USER">
 		SELECT
@@ -170,6 +493,7 @@
 		,BTOB_BILL_AUTH
 		,OVERSEAS_INFO_AUTH
 		,RESPONSIBLE_NO
+		<!-- ,ID_PASS_DEL_AUTH -->
 		FROM
 		MST_USER
 		WHERE
@@ -225,14 +549,6 @@
 		WHERE
 		SYS_USER_ID = ${sysUserId}
 	</sql-template>
-	
-	<sql-template id="GET_DOMESTIC_SLIP_MAX_ID">
-		SELECT
-		COALESCE(MAX(SYS_DOMESTIC_SLIP_ID),0) sys_domestic_slip_id
-		FROM
-		DOMESTIC_SLIP
-	</sql-template>
-
 
 	<sql-template id="SEL_MAX_USER_ID">
 		SELECT
@@ -4879,6 +5195,7 @@
 		</if-not-empty>
 		,UPDATE_DATE = current_timestamp
 		,UPDATE_USER_ID = ${updateUserId}
+		,HAIBANG_FLG = ${haibangFlg}
 		WHERE
 		SYS_ITEM_ID = ${sysItemId}
 	</sql-template>
@@ -5072,6 +5389,7 @@
 			,ITEM_PRICE.PRICE
 			,ASSEMBLY_NUM
 			,ANS.ANNUAL_AVERAGE_SALES_NUM
+			,HAIBANG_FLG
 		FROM
 			MST_ITEM
 			LEFT JOIN
@@ -5486,6 +5804,7 @@
 		,ITEM_NUM
 		,ITEM_CODE
 		,ITEM_NM
+		,TOTAL_STOCK_NUM
 		,LEAVE_CLASS_FLG
 
 		,DELETE_FLAG
@@ -5502,6 +5821,7 @@
 		SYS_ITEM_ID
 		,ITEM_CODE
 		,ITEM_NM
+		,TOTAL_STOCK_NUM
 		,LEAVE_CLASS_FLG
 		FROM
 		MST_ITEM
@@ -5732,6 +6052,7 @@
 			,M_ITEM.MODEL
 			,M_ITEM.ITEM_LEAD_TIME
 			,M_ITEM.SYS_SUPPLIER_ID
+			,HAIBANG_FLG
 			,ANS.ANNUAL_AVERAGE_SALES_NUM
 			,ANS.ONE_MONTH_AGO
 			,ANS.TWO_MONTH_AGO
@@ -5806,6 +6127,7 @@
 				,CAR_MODEL
 				,MODEL
 				,ITEM_LEAD_TIME
+				,HAIBANG_FLG
 
 			FROM
 				MST_ITEM
@@ -6215,6 +6537,14 @@
 			WHEN ORDER_POOL_FLG = '1' THEN (ORDER_NUM = 0 or ORDER_NUM is null)
 			END
 		</if-equals>
+		<if-not-equals value="1" varName="haibangFlgIgnore">
+			<if-equals value="1" varName="haibangFlg">
+				AND M_ITEM.HAIBANG_FLG = ${haibangFlg}
+			</if-equals>
+			<if-equals value="0" varName="haibangFlg">
+				AND (M_ITEM.HAIBANG_FLG = '0' OR M_ITEM.HAIBANG_FLG IS NULL) 
+			</if-equals>
+		</if-not-equals>
 
 <!-- 		<if-not-empty varName="itemCodeFrom"> -->
 <!-- 			AND -->
@@ -6394,7 +6724,7 @@
 				,PACKING_SIZE
 				,WEIGHT
 				,DOCUMENT_REMARKS
-
+				,MST_ITEM.HAIBANG_FLG
 			FROM
 				MST_ITEM
 				INNER JOIN
@@ -6838,7 +7168,14 @@
 			WHEN ORDER_POOL_FLG = '1' THEN (ORDER_NUM = 0 or ORDER_NUM is null)
 			END
 		</if-equals>
-
+		<if-not-equals value="1" varName="haibangFlgIgnore">
+			<if-equals value="1" varName="haibangFlg">
+				AND M_ITEM.HAIBANG_FLG = ${haibangFlg}
+			</if-equals>
+			<if-equals value="0" varName="haibangFlg">
+				AND (M_ITEM.HAIBANG_FLG = '0' OR M_ITEM.HAIBANG_FLG IS NULL) 
+			</if-equals>
+		</if-not-equals>
 
 
 <!-- 		<if-not-empty varName="itemCodeFrom"> -->
@@ -14284,7 +14621,7 @@
 		WHERE
 		DELETE_FLAG = '0'
 		AND
-		MANAGEMENT_CODE IN
+		LOWER(MANAGEMENT_CODE) IN
 		(${managementCodesSet})
 	</sql-template>
 

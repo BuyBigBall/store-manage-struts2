@@ -876,6 +876,17 @@ function actAlert(alertTypeValue) {
 		alert('組立可数更新に失敗しました\r\n再度更新を行ってください。');
 	}
 }
+
+function actRuleAlert(alertTypeValue, alertDescription) {
+
+	if (alertTypeValue == '0' || alertTypeValue == '') {
+		return;
+	} else if (alertTypeValue >= '1') {
+		alert(alertDescription);
+	
+	}
+}
+
 function numActAlert(alertTypeValue, numObj) {
 
 	if (alertTypeValue == '0' || alertTypeValue == '') {

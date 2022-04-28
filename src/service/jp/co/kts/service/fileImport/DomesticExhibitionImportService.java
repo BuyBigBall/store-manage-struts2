@@ -86,9 +86,9 @@ public class DomesticExhibitionImportService {
 
 		try {
 			//エクセルファイルの取り込み
-			POIFSFileSystem filein 		= new POIFSFileSystem();
-			InputStream 	inputStream = excelImportForm.getInputStream();
-							filein 		= new POIFSFileSystem(inputStream);
+			POIFSFileSystem filein = new POIFSFileSystem();
+			InputStream inputStream = excelImportForm.getInputStream();
+			filein = new POIFSFileSystem(inputStream);
 
 			//エクセルを開く
 			wb = new HSSFWorkbook();
@@ -190,7 +190,14 @@ public class DomesticExhibitionImportService {
 							  break;
 						  }
 						  // 数値
-						  	text = String.valueOf(cell.getNumericCellValue());
+						  double _value = cell.getNumericCellValue();
+						  int ___value = (int) _value;
+						  double deffer = (_value - ___value) * 1000;
+						  if ((int) deffer == 999) {
+							  	text = String.valueOf(Math.round(_value));
+						  }else {
+							  	text = String.valueOf(_value);
+						  }
 //						  	double val = Double.valueOf(text)+0.1;
 //						  	text = String.valueOf((long) val);
 
@@ -326,7 +333,7 @@ public class DomesticExhibitionImportService {
 			itemRateOver = 0;
 			
 			if (!GenericValidator.isBlankOrNull(strPurchasingCost)) {
-				purchasingCost = Long.valueOf(strPurchasingCost);
+				purchasingCost = Double.valueOf(strPurchasingCost);
 			}
 			
 		}

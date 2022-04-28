@@ -117,7 +117,10 @@ public class SearchItemDTO {
 	private String arrivalDateFrom;
 	/**入荷日TO*/
 	private String arrivalDateTo;
+	
+	private String haibangFlg;
 
+	private String haibangContainFlg;
 
 
 	public SearchItemDTO(String empty) {
@@ -819,6 +822,34 @@ public class SearchItemDTO {
 	 */
 	public void setOrderNum0Flg(String orderNum0Flg) {
 		this.orderNum0Flg = orderNum0Flg;
+	}
+
+	/**
+	 * @return the haibangFlg
+	 */
+	public String getHaibangFlg() {
+		return haibangFlg;
+	}
+
+	/**
+	 * @param haibangFlg the haibangFlg to set
+	 */
+	public void setHaibangFlg(String haibangFlg) {
+		this.haibangFlg = haibangFlg;
+	}
+
+	/**
+	 * @return the haibangContainFlg
+	 */
+	public String getHaibangContainFlg() {
+		return haibangContainFlg;
+	}
+
+	/**
+	 * @param haibangContainFlg the haibangContainFlg to set
+	 */
+	public void setHaibangContainFlg(String haibangContainFlg) {
+		this.haibangContainFlg = haibangContainFlg;
 	}
 
 }

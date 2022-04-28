@@ -1,13 +1,16 @@
 package jp.co.kts.ui.login;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForward;
 
@@ -19,6 +22,8 @@ import jp.co.keyaki.cleave.fw.ui.web.struts.AppActionMapping;
 import jp.co.keyaki.cleave.fw.ui.web.struts.AppBaseAction;
 import jp.co.keyaki.cleave.fw.ui.web.struts.AppBaseForm;
 import jp.co.keyaki.cleave.fw.ui.web.struts.StrutsBaseConst;
+import jp.co.kts.app.common.entity.MstRulesDTO;
+import jp.co.kts.app.common.entity.MstRulesListDTO;
 import jp.co.kts.app.common.entity.MstUserDTO;
 import jp.co.kts.app.extendCommon.entity.ExtendNoticeBoardDTO;
 import jp.co.kts.core.SystemSetting;
@@ -29,6 +34,8 @@ import jp.co.kts.ui.web.struts.WebConst;
 
 
 public class LoginAction extends AppBaseAction{
+	
+	
 
 	@Override
 	protected ActionForward doExecute(AppActionMapping appMapping,
@@ -139,6 +146,8 @@ public class LoginAction extends AppBaseAction{
 
 		userInfo.setFamilyNameKana(userDTO.getUserFamilyNmKana());
 		userInfo.setFirstNameKana(userDTO.getUserFirstNmKana());
+		
+		request.getSession().setAttribute("LOGIN_USER_ID", userInfo.getUserId());
 
 		request.getSession().setAttribute(WebFwConst.SESSION_KEY_LOGIN_USER, userInfo);
 		ActionContext.setLoginUserInfo(userInfo);
@@ -148,6 +157,8 @@ public class LoginAction extends AppBaseAction{
 		form.setUserDTO(userService.getUser(userDTO.getSysUserId()));
 		String fullName = (form.getUserDTO().getUserFamilyNmKanji() + " " + form.getUserDTO().getUserFirstNmKanji());
 		request.getSession().setAttribute("LOGIN_USER_NAME", fullName);
+		
+		
 
 		/*  2015/12/15 ooyama ADD START 法人間請求書機能対応  */
 
@@ -158,6 +169,8 @@ public class LoginAction extends AppBaseAction{
 
 		// 海外注文管理権限を設定
 		request.getSession().setAttribute("LOGIN_USER_OVERSEAS_INFO_AUTH", userDTO.getOverseasInfoAuth());
+		
+		request.getSession().setAttribute("LOGIN_USER_MASTER_LIST", form.getUserDTO().getMstMasterList());
 
 		//掲示板表示用
 		form.setNoticeList(service.getNoticeBoard());

@@ -77,9 +77,9 @@ public class DomesticExhibitionImportAction extends AppBaseAction {
 			DomesticExhibitionImportForm form, HttpServletRequest request) throws Exception {
 
 		//インスタンス生成
-		DomesticExhibitionImportService service 	= new DomesticImportUpdateService();
-		ActionErrorExcelImportDTO 		dto 		= new ActionErrorExcelImportDTO();
-		RegistryMessageDTO 				messageDTO 	= new RegistryMessageDTO();
+		DomesticExhibitionImportService service = new DomesticImportUpdateService();
+		ActionErrorExcelImportDTO dto = new ActionErrorExcelImportDTO();
+		RegistryMessageDTO messageDTO = new RegistryMessageDTO();
 
 		begin();
 
@@ -138,9 +138,9 @@ public class DomesticExhibitionImportAction extends AppBaseAction {
 			DomesticExhibitionImportForm form, HttpServletRequest request) throws Exception {
 
 		//インスタンス生成
-		DomesticExhibitionImportService service 	= new DomesticImportInsertService();
-		ActionErrorExcelImportDTO 		dto 		= new ActionErrorExcelImportDTO();
-		RegistryMessageDTO 				messageDTO 	= new RegistryMessageDTO();
+		DomesticExhibitionImportService service = new DomesticImportInsertService();
+		ActionErrorExcelImportDTO dto = new ActionErrorExcelImportDTO();
+		RegistryMessageDTO messageDTO = new RegistryMessageDTO();
 
 		begin();
 		try {

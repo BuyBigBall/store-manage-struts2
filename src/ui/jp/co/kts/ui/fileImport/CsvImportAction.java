@@ -623,9 +623,6 @@ public class CsvImportAction extends AppBaseAction{
 	 */
 	private ActionForward csvDomesticListImport(AppActionMapping appMapping,
 			CsvImportForm form, HttpServletRequest request) throws Exception {
-		
-		java.lang.System.out.println( "start : " + (new java.util.Date()).toLocaleString()  );
-		
 		RegistryMessageDTO messageDTO = new RegistryMessageDTO();
 		//エラーメッセージ初期化
 		form.setCsvErrorDTO(new ErrorDTO());
@@ -674,23 +671,19 @@ public class CsvImportAction extends AppBaseAction{
 		//csvインポート
 		idx = 0;
 		for (CsvInputDTO dto: form.getCsvInputList()) {
-			//insert into domestic_csv_import Table
+
 			form.getCsvErrorList().add(service.importDomesticFile(corporationIds[idx++], dto.getFileUp(),form.getCsvImportList()));
 		}
 
 		//国内注文書作成
 		SaleCsvService saleCsvService = new SaleCsvService();
-		// csv file datas into slip's List object
-		
-		java.lang.System.out.println( "cur : " + (new java.util.Date()).toLocaleString()  );
 		List<List<CsvImportDTO>> csvImportLists = saleCsvService.csvToSaleSlipList(form.getCsvImportList());
 		for (List<CsvImportDTO> list: csvImportLists) {
-			//insert into domestic_csv Table and domestic_item Table
+
 			ErrorDTO dto = service.csvToDomesticSlip(list);
 			form.getCsvErrorList().add(dto);
 			form.setTrueCount(dto.getTrueCount() + form.getTrueCount());
 		}
-		java.lang.System.out.println( "end : " + (new java.util.Date()).toLocaleString()  );
 
 //		for (ErrorDTO error : form.getCsvErrorList()) {
 //			if (!error.isSuccess()) {

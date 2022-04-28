@@ -778,7 +778,7 @@ public class DomesticOrderService {
 		dto.setPurchaseOrderNo(new SequenceDAO().getMaxPurchaseOrderNo() + 1);
 
 		DomesticOrderDAO dao = new DomesticOrderDAO();
-		dao.registryDomesticSlipDAO(dto);	// <--- 0412 can be removed.
+		dao.registryDomesticSlipDAO(dto);
 		return dto;
 	}
 }

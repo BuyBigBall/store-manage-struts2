@@ -181,7 +181,7 @@ public class DomesticImportInsertService extends DomesticExhibitionImportService
 		for (List<String> strList: strDomesticInfoList) {
 			//管理品番を一時的に取得します
 			String managementCd = strList.get(0);
-			managementCdSet.add(managementCd);
+			managementCdSet.add(managementCd.toLowerCase());
 		}
 		DomesticExhibitionService domesticService = new DomesticExhibitionService();
 		List<DomesticExhibitionDTO> domesticExhibitionDtoList = domesticService.getDomesticExhibitionDTOList(managementCdSet);
@@ -235,10 +235,12 @@ public class DomesticImportInsertService extends DomesticExhibitionImportService
 			//管理品番重複用のマップに管理品番を格納
 			checkUpdMngCd.put(managementCd,String.valueOf(errorIndex));
 
+			String newCd = String.valueOf(managementCd.toLowerCase());
 			//品番が存在する場合エラー
 			boolean existsManagementCode = false;
 			for(DomesticExhibitionDTO domesticExhibitonDto : domesticExhibitionDtoList) {
-				if(managementCd.equals(domesticExhibitonDto.getManagementCode())) {
+				String oldCd = String.valueOf(domesticExhibitonDto.getManagementCode().toLowerCase());
+				if(newCd.equals(oldCd)) {
 					existsManagementCode = true;
 					break;
 				}

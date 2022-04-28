@@ -110,6 +110,12 @@
 								<nested:hidden property="deadStockFlg" value="off"></nested:hidden>
 							<td style="padding-left: 20px;"><label><nested:checkbox property="keepFlg" />キープ有</label></td>
 								<nested:hidden property="keepFlg" value="off"></nested:hidden>
+							<td style="padding-left: 20px;">
+								<label><nested:checkbox property="haibangFlg" styleId="haibangFlg"/>廃盤商品のみ</label>&nbsp;&nbsp;&nbsp;
+								<label><nested:checkbox property="haibangContainFlg"  styleId="haibangContainFlg"/>廃盤商品含む</label>
+							</td>
+								<nested:hidden property="haibangFlg" value="off"></nested:hidden>
+								<nested:hidden property="haibangContainFlg" value="off"></nested:hidden>
 						</tr>
 						<tr>
 							<td>商品名</td>
@@ -467,6 +473,7 @@
     	window.onpageshow = function(event) {
     		if (sessionStorage.getItem('toItemDetail') == 'true') {
               	var url = window.location.href;
+              	
             	if (url.indexOf("itemList") >= 0) {
                 	location.reload();
             		$(".overlay").css("display", "block");
@@ -475,16 +482,18 @@
     		}
         };
     	
-    	/* document.addEventListener("visibilitychange", function() {
+    	document.addEventListener("visibilitychange", function() {
     	    if (document.hidden){
+    	    	console.log(url.indexOf("itemList"));
     	    } else {
               	var url = window.location.href;
+              	console.log(url.indexOf("itemList"));
             	if (url.indexOf("itemList") >= 0) {
                 	location.reload();
             		$(".overlay").css("display", "block");
             	}
     	    }
-    	}); */
+    	});
 
 		$("body").keydown( function(event) {
 			if(event.which === 13){
@@ -641,12 +650,24 @@
 					return false;
 				}
 			}
-
+			
 			$(".overlay").css("display", "block");
 			$(".message").text("検索中");
 
 			goTransaction("itemList.do");
 		});
+		
+		$("#haibangContainFlg").change(function() {
+		    if(this.checked) {
+		    	$('#haibangFlg').prop('checked', false)
+		    }
+		});
+		$("#haibangFlg").change(function() {
+		    if(this.checked) {
+		    	$('#haibangContainFlg').prop('checked', false)
+		    }
+		});
+		
 
 		//************************注文数計算ボタン*********************
 		//画面読み込み時、チェックボックスが販売情報のときは計算し、それ以外は隠す

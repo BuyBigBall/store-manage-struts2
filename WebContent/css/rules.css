@@ -1,0 +1,84 @@
+.justify-content-arround {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+    top: 40%;
+}
+.justify-content-center {
+    display: flex;
+    justify-content: center;
+}
+
+.w-50{
+	width:50%;
+}
+
+@media (max-width:760px){
+	.w-50{
+		width:100%;
+	}
+		
+}
+.mx-20{
+	margin-left:20px;
+	margin-right:20px;
+}
+
+li.footer_button {
+    display: inline;
+}
+.txt-right{
+	text-align: right;
+}
+fieldset {
+	height: 22vh;
+    width: 73%;
+    margin: 0px auto;
+}
+fieldset .footerButtonArea{
+	position: relative;
+    top: 42%;
+    right: 20px;
+} 
+fieldset table input[type=text], fieldset table input[type=password] {
+    padding: 5px;
+    width: 95%;
+}
+
+.viewChildRule, 
+.editChildRule{
+	cursor: pointer;	
+}
+
+table.user-list td div{
+	display:flex;
+	align-items: center;
+}
+table.user-list td div span{
+	padding-left:3px;
+}
+.border-none{
+	border:none;
+    background: none;
+} 
+.hand{
+	cursor:pointer;
+} 
+.text-center{
+	text-align: center;
+}
+input[type=password].border-none:focus,
+input[type=password].border-none:active,
+input[type=password].border-none:visited {
+	border:none;
+	box-shadow: none;
+}
+
+.btn-customize{
+	padding: 3px 35px !important;
+    border-radius: 5px !important;
+}
+
+

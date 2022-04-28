@@ -139,12 +139,9 @@ public class ItemAction extends AppBaseAction{
 	private ActionForward itemList(AppActionMapping appMapping, ItemForm form,
 			HttpServletRequest request) throws DaoException {
 
-		//HttpServletRequest request = (HttpServletRequest) servletRequest;
-		HttpSession session = request.getSession(false);		//yasha
-		
 		ItemService itemService = new ItemService();
 		RegistryMessageDTO messageDTO = new RegistryMessageDTO();
-		form.setSysItemIdList(itemService.getSysItemIdList(session, form.getSearchItemDTO()));
+		form.setSysItemIdList(itemService.getSysItemIdList(form.getSearchItemDTO()));
 		form.setSysItemIdListSize(form.getSysItemIdList().size());
 		form.setPageIdx(0);
 		form.setItemList(itemService.getItemList(form.getSysItemIdList(), form.getPageIdx(), form.getSearchItemDTO()));
@@ -493,6 +490,7 @@ public class ItemAction extends AppBaseAction{
 
 		//最終更新者情報の取得
 		form.setExtendMstUserDTO(userService.getUserName(form.getMstItemDTO().getUpdateUserId()));
+		form.setHaibangFlg(form.getMstItemDTO().getHaibangFlg());
 
 		return appMapping.findForward(StrutsBaseConst.FORWARD_NAME_SUCCESS);
 	}
@@ -512,6 +510,9 @@ public class ItemAction extends AppBaseAction{
 
 		ItemService itemService = new ItemService();
 		itemService.setFlags(form.getMstItemDTO());
+		
+		form.getMstItemDTO().setHaibangFlg(form.getHaibangFlg().equals("on") ? "1" : "0");
+		
 		//I/O商品
 		form.setErrorMessageDTO(itemService.updateItem(form.getMstItemDTO()));
 		if (!form.getErrorMessageDTO().isSuccess()) {
@@ -520,7 +521,6 @@ public class ItemAction extends AppBaseAction{
 		}
 //		//更新情報をインサート →必要になったら使ってください。
 //		itemService.insertItemInfo(form.getMstItemDTO(), form.getMstItemDTO());
-
 
 		//Kind原価
 		itemService.updateKindCost(form.getMstItemDTO());
@@ -810,7 +810,6 @@ public class ItemAction extends AppBaseAction{
 	private ActionForward itemListDownLoad(AppActionMapping appMapping, ItemForm form,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		HttpSession session = request.getSession(false);		//yasha
 		long userId = ActionContext.getLoginUserInfo().getUserId();
 		UserService userService = new UserService();
 		form.setMstUserDTO(userService.getUserName(userId));
@@ -839,17 +838,14 @@ public class ItemAction extends AppBaseAction{
 				filePath = this.getServlet().getServletContext().getRealPath(ServiceConst.NOT_AUTH_PRICE_INFO_LIST_TEMPLATE_PATH);
 			}
 			break;
-			
 		//助ネコCSVテンプレートのパス
 		case WebConst.DOWNLOAD_TYPE_CODE4:
 			filePath = this.getServlet().getServletContext().getRealPath(ServiceConst.ITEM_LIST_TEMPLATE_PATH);
 			break;
-			
 		// 通常のDL機能（新規DL機能が実装されるまで！）
 		case StringUtils.EMPTY:
 			filePath = this.getServlet().getServletContext().getRealPath(ServiceConst.ITEM_LIST_TEMPLATE_PATH);
 			break;
-			
 		//新在庫Excelテンプレートのパス
 		case WebConst.DOWNLOAD_TYPE_CODE5:
 			if (form.getMstUserDTO().getOverseasInfoAuth().equals(WebConst.AUTH_INFO_OK)) {
@@ -884,18 +880,18 @@ public class ItemAction extends AppBaseAction{
 		//商品情報
 		// 現在は使用しない二回目の本番リリース時までに作成する
 		case WebConst.DOWNLOAD_TYPE_CODE1:
-			workBook = exportItemListService.getExportItemInfoList(session, form.getSearchItemDTO(), workBook, authInfo, sheetNo);
+			workBook = exportItemListService.getExportItemInfoList(form.getSearchItemDTO(), workBook, authInfo, sheetNo);
 			fname = "商品詳細情報_" + date + ".xlsx";
 			break;
 		//在庫情報
 		case WebConst.DOWNLOAD_TYPE_CODE2:
-			form.setSysItemIdList(itemService.getSysItemIdList(session, form.getSearchItemDTO()));
+			form.setSysItemIdList(itemService.getSysItemIdList(form.getSearchItemDTO()));
 			workBook = exportItemListService.getExportStockItemInfoList(form.getSysItemIdList(), workBook, sheetNo);
 			fname = "在庫情報_" + date + ".xlsx";
 			break;
 		//価格情報
 		case WebConst.DOWNLOAD_TYPE_CODE3:
-			form.setSysItemIdList(itemService.getSysItemIdList(session, form.getSearchItemDTO()));
+			form.setSysItemIdList(itemService.getSysItemIdList(form.getSearchItemDTO()));
 			workBook = exportItemListService.getExportPriceInfoList(form.getSysItemIdList(), workBook, authInfo, sheetNo);
 			fname = "価格情報_" + date + ".xlsx";
 			break;
@@ -911,9 +907,9 @@ public class ItemAction extends AppBaseAction{
 		//新在庫Excel
 		case WebConst.DOWNLOAD_TYPE_CODE5:
 
-			form.setSysItemIdList(itemService.getSysItemIdList(session, form.getSearchItemDTO()));
+			form.setSysItemIdList(itemService.getSysItemIdList(form.getSearchItemDTO()));
 			sheetNo = 0;
-			workBook = exportItemListService.getExportItemInfoList(session, form.getSearchItemDTO(), workBook, authInfo, sheetNo);
+			workBook = exportItemListService.getExportItemInfoList(form.getSearchItemDTO(), workBook, authInfo, sheetNo);
 			sheetNo = 1;
 			workBook = exportItemListService.getExportStockItemInfoList(form.getSysItemIdList(), workBook, sheetNo);
 			sheetNo = 2;

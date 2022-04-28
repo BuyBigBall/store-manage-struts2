@@ -93,7 +93,7 @@ public class DomesticImportUpdateService extends DomesticExhibitionImportService
 			for (List<String> strList: strDomesticInfoList) {
 				//管理品番を一時的に取得します
 				String managementCd = strList.get(0);
-				managementCdSet.add(managementCd);
+				managementCdSet.add(managementCd.toLowerCase());
 			}
 			DomesticExhibitionService domesticService = new DomesticExhibitionService();
 			List<DomesticExhibitionDTO> domesticExhibitionDtoList = domesticService.getDomesticExhibitionDTOList(managementCdSet);
@@ -172,10 +172,13 @@ public class DomesticImportUpdateService extends DomesticExhibitionImportService
 				//管理品番半角英数ハイフンチェック
 				ServiceValidator.strMatchesCheckSlash(dto.getResult(), managementCd, String.valueOf(errorIndex),"管理品番");
 
+				String newCd = String.valueOf(managementCd.toLowerCase());
 				//品番が存在しない場合エラー
 				boolean existsManagementCode = false;
 				for(DomesticExhibitionDTO domesticExhibitonDto : domesticExhibitionDtoList) {
-					if(managementCd.equals(domesticExhibitonDto.getManagementCode())) {
+					String oldCd = String.valueOf(domesticExhibitonDto.getManagementCode().toLowerCase());
+					if(newCd.equals(oldCd)) {
+						managementCd = domesticExhibitonDto.getManagementCode();
 						existsManagementCode = true;
 						break;
 					}
@@ -446,7 +449,7 @@ public class DomesticImportUpdateService extends DomesticExhibitionImportService
 					itemCode = itemCode.substring(0, itemCode.indexOf("."));
 				}
 
-				managementCdSet.add(itemCode);
+				managementCdSet.add(itemCode.toLowerCase());
 			}
 
 
@@ -458,10 +461,11 @@ public class DomesticImportUpdateService extends DomesticExhibitionImportService
 					itemCode = itemCode.substring(0, itemCode.indexOf("."));
 				}
 
-				managementCdSet.add(itemCode);
+				managementCdSet.add(itemCode.toLowerCase());
 			}
 		}
 
+		System.out.println(managementCdSet);
 		DomesticExhibitionService domesticService = new DomesticExhibitionService();
 		List<DomesticExhibitionDTO> domesticExhibitionDtoList = domesticService.getDomesticExhibitionDTOList(managementCdSet);
 
