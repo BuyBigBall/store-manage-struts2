@@ -608,10 +608,23 @@ public class ItemService {
 	 * @return
 	 * @throws DaoException
 	 */
-	public List<SysItemIdDTO> getSysItemIdList(SearchItemDTO searchItemDTO)
+ 	// speed session-block
+	public List<SysItemIdDTO> getSysItemIdList(HttpSession session, SearchItemDTO searchItemDTO)
 			throws DaoException {
 
-		return new ItemDAO().getItemSearchList(searchItemDTO);
+		//return new ItemDAO().getItemSearchList(searchItemDTO);
+		List<ResultItemSearchDTO> retList = new ItemDAO().getExportItemSearchList(searchItemDTO);
+		session.setAttribute("getExportItemSearchList(searchItemDTO)", retList );
+		
+		List<SysItemIdDTO> ret = new ArrayList<>();
+		for(int i=0; i<retList.size(); i++)
+		{
+			long sysItemId = retList.get(i).getSysItemId();
+			SysItemIdDTO idDto = new SysItemIdDTO();
+			idDto.setSysItemId(sysItemId);
+			ret.add(idDto);	
+		}
+		return ret;
 	}
 
 	public List<ResultItemSearchDTO> getItemList(

@@ -549,6 +549,14 @@
 		WHERE
 		SYS_USER_ID = ${sysUserId}
 	</sql-template>
+	
+	<sql-template id="GET_DOMESTIC_SLIP_MAX_ID">
+		SELECT
+		COALESCE(MAX(SYS_DOMESTIC_SLIP_ID),0) sys_domestic_slip_id
+		FROM
+		DOMESTIC_SLIP
+	</sql-template>
+
 
 	<sql-template id="SEL_MAX_USER_ID">
 		SELECT

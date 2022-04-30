@@ -27,11 +27,11 @@ public class RulesDetailService {
 	private static final String RULE_LIST_CHECK_FLG_ON = "on";
 	
 	public List<MstRulesListDTO> getRuleDetail(long ruleId) throws Exception {
-		System.out.println(ruleId);
+		//System.out.println(ruleId);
 		RulesDAO dao = new RulesDAO();
 		UserInfo userInfo = ActionContext.getLoginUserInfo();
 		List<MstRulesListDTO> listRulesDetail = dao.getRuleDetailInfoByUserId(ruleId, userInfo.getUserId());
-		System.out.println(listRulesDetail);
+		//System.out.println(listRulesDetail);
 		for(MstRulesListDTO dto : listRulesDetail) {
 			dto.setListPass(CipherUtil.decodeString(dto.getListPass()));
 		}

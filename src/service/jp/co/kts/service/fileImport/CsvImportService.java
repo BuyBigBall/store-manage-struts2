@@ -382,6 +382,8 @@ public class CsvImportService {
 			return csvErrorDTO;
 		}
 
+		// speed session-block
+		long iMaxId = (new SequenceDAO()).getMaxSysDomesticImportId() + 1;
 		for (CsvRecord csvRecord : context) {
 
 			String[] csvLineArray = csvRecord.toArray();
@@ -392,8 +394,8 @@ public class CsvImportService {
 			csvImportDTO.setOrderRemarksMemo(csvImportDTO.getOrderMemo() + "\r\n" + csvImportDTO.getOrderRemarks());
 
 			csvImportDTO.setFileNm(fileUp.getFileName());
-
-			csvImportDTO.setSysImportId((new SequenceDAO().getMaxSysDomesticImportId() + 1));
+			// speed session-block
+			csvImportDTO.setSysImportId(iMaxId++);
 
 			csvImportDTO.setSysCorporationId(corporationId);
 
@@ -422,6 +424,7 @@ public class CsvImportService {
 		DomesticExhibitionDTO exhibitionDto = new DomesticExhibitionDTO();
 		DomesticExhibitionDTO exhbyRsltDto = new DomesticExhibitionDTO();
 		DomesticExhibitionDAO exhibitionDao = new DomesticExhibitionDAO();
+		DomesticSlipDAO slipDao = new DomesticSlipDAO();		// speed session-block
 		ItemService itemService = new ItemService();
 		ErrorMessageDTO messageDTO = new ErrorMessageDTO();
 		//商品コード(店舗)の文字列を保持して置く→納入先を振り分ける際に使用する
@@ -436,7 +439,12 @@ public class CsvImportService {
 			csvErrorDTO.getErrorMessageList().add(messageDTO);
 			return csvErrorDTO;
 		}
-
+		// speed session-block
+		String strDomesticSlipInsertQuery = "";
+		ExtendDomesticOrderSlipDTO domesticSlipDto = new ExtendDomesticOrderSlipDTO();
+		DomesticOrderSlipDTO daodto = slipDao.getMaxId();
+		long lDomesticId = daodto.getSysDomesticSlipId() + 1;
+		//<---
 		//csvファイルのままだと一つの受注番号で複数行あるのでそれを正規化するイメージs
 		for (int i = 0; i < csvImportList.size(); i++) {
 
@@ -483,9 +491,11 @@ public class CsvImportService {
 					if (StringUtils.equals(csvImportDTOAfter.getItemClassification(), "商品")) {
 
 						long sysItemId = itemService.getSysItemIdFromShopCd(csvImportDTOAfter.getShopItemCd());
-						String shopItemCd = itemService.getItemCd(csvImportDTOAfter.getShopItemCd());
-						if (sysItemId == 0) {
-							sysItemId = itemService.getSysItemIdFromShopCd(shopItemCd);
+						// speed session-block
+						// there are not old_item_code 0412
+//						String shopItemCd = itemService.getItemCd(csvImportDTOAfter.getShopItemCd());
+//						if (sysItemId == 0) {
+//							sysItemId = itemService.getSysItemIdFromShopCd(shopItemCd);
 							if (sysItemId == 0) {
 								//問屋毎に伝票を分けるため検索を実行する
 								exhibitionDto.setItemNm(csvImportDTOAfter.getItemNm());
@@ -532,7 +542,7 @@ public class CsvImportService {
 										csvImportList.remove(j--);
 								}
 							}
-						}
+//						}		//<--- 0412 		// speed session-block
 					}
 				}
 			}
@@ -545,13 +555,60 @@ public class CsvImportService {
 
 			//伝票の作成
 			DomesticOrderService dao = new DomesticOrderService();
-			domesticDto = dao.registryDomesticOrderSlipCsv(domesticDto);
-			long sysDomesticOrderId = domesticDto.getSysDomesticSlipId();
+			// speed session-block
+			java.lang.System.out.println("record : " + (new java.util.Date()).toLocaleString());
+
+			// ###############--> exchanging to block Insert 
+//			domesticDto = dao.registryDomesticOrderSlipCsv(domesticDto);
+//			long sysDomesticOrderId = domesticDto.getSysDomesticSlipId();
+			long sysDomesticOrderId = ++lDomesticId;
+			strDomesticSlipInsertQuery = makeDomesticSlipQuery(strDomesticSlipInsertQuery, lDomesticId, domesticDto);
+			
+			if(i%100==0)
+			{	// block ending and new block starting
+				boolean isHandleException 		= false;
+				PreparedStatement 		stmt 	= null;
+				Connection conn = ConnectionManager.get(ConnectionManager.DEFALUT_CONNECTION_NO);
+				
+				try {
+					stmt = conn.prepareStatement( strDomesticSlipInsertQuery );
+					//bindParameters(stmt, null );
+					stmt.executeUpdate();
+				} catch (SQLException sqle) {
+					isHandleException = true;
+					throw new DaoException(DaoMessageDefine.E000009, "sqlInfo=" + strDomesticSlipInsertQuery, sqle);
+				} finally {
+					JdbcUtils.close(stmt, isHandleException);
+					stmt = null;
+				}
+				strDomesticSlipInsertQuery = "";
+			}
+			// <--- ##########################
 
 			//国内注文商品の作成
 			resultCnt += dao.registryDomesticOrderItemList(orderItemList, sysDomesticOrderId);
 		}
-
+		// speed session-block
+		if(strDomesticSlipInsertQuery!="")
+		{
+			boolean isHandleException 		= false;
+			PreparedStatement 		stmt 	= null;
+			Connection conn = ConnectionManager.get(ConnectionManager.DEFALUT_CONNECTION_NO);
+			
+			try {
+				stmt = conn.prepareStatement( strDomesticSlipInsertQuery );
+				//bindParameters(stmt, null );
+				stmt.executeUpdate();
+			} catch (SQLException sqle) {
+				isHandleException = true;
+				throw new DaoException(DaoMessageDefine.E000009, "sqlInfo=" + strDomesticSlipInsertQuery, sqle);
+			} finally {
+				JdbcUtils.close(stmt, isHandleException);
+				stmt = null;
+			}
+		}
+		//<---
+		
 		//国内商品が一件もない場合
 		if (csvErrorDTO.getTrueCount() == 0) {
 			messageDTO.setErrorMessage("国内商品が存在しないCSVファイルです。");
@@ -569,7 +626,83 @@ public class CsvImportService {
 
 		return csvErrorDTO;
 	}
-
+	// speed session-block
+	private String makeDomesticSlipQuery(String str, long pid, ExtendDomesticOrderSlipDTO dto) {
+		if (str.equals(""))
+			str = "INSERT INTO \"public\".\"domestic_slip\" (\r\n"
+					+ "    \"sys_domestic_slip_id\", \"item_order_date\", \"sys_corporation_id\", \"mall\", \"order_no\", \"note_turn\", \"sender_remarks\", \"sys_warehouse_id\", \r\n"
+					+ "    \"warehouse_nm\", \"zip\", \"address_fst\", \"address_nxt\", \"tell_no\", \"logistic_nm\", \"delete_flag\", \"create_date\", \"create_user_id\", \r\n"
+					+ "    \"update_date\", \"update_user_id\", \"order_slip_date\", \"purchase_order_no\", \"history_info\", \"print_check_flag\", \"address_nxt2\", \r\n"
+					+ "    \"sys_domestic_import_id\") VALUES ";
+		else
+			str += ",";
+		str += "(";
+		str += pid;
+		str += ", ";
+		str += ("'" + dto.getItemOrderDate() + "'");
+		str += ", ";
+		str += (" " + dto.getSysCorporationId() + " ");
+		str += ", ";
+		str += ("'" + dto.getMall() + "'");
+		str += ", ";
+		str += ("'" + dto.getOrderNo() + "'");
+		str += ", ";
+		str += ("'" + dto.getNoteTurn() + "'");
+		str += ", ";
+		str += ("'" + dto.getSenderRemarks().replace("'", "''") + "'");
+		str += ", ";
+		str += (" " + dto.getSysWarehouseId() + " ");
+		str += ", ";
+		str += ("'" + dto.getWarehouseNm() + "'");
+		str += ", ";
+		str += ("'" + dto.getZip() + "'");
+		str += ", ";
+		str += ("'" + dto.getAddressFst() + "'");
+		str += ", ";
+		str += ("'" + dto.getAddressNxt() + "'");
+		str += ", ";
+		str += ("'" + dto.getTellNo() + "'");
+		str += ", ";
+		str += ("'" + dto.getLogisticNm().replace("'", "''") + "'");
+		str += ", ";
+		str += ("0"); // delete Flag
+		str += ", ";
+		str += ("'"
+				+ (dto.getCreateDate() != null ? dto.getCreateDate()
+						: ((new java.util.Date()).getYear() + 1900) + "-" + ((new java.util.Date()).getMonth() + 1)
+								+ "-" + (new java.util.Date()).getDate() + " " + (new java.util.Date()).getHours() + ":"
+								+ (new java.util.Date()).getMinutes() + ":" + (new java.util.Date()).getSeconds())
+				+ "'");
+		str += ", ";
+		str += (" " + dto.getCreateUserId() + " ");
+		str += ", ";
+		str += ("'"
+				+ (dto.getUpdateDate() != null ? dto.getUpdateDate()
+						: ((new java.util.Date()).getYear() + 1900) + "-" + ((new java.util.Date()).getMonth() + 1)
+								+ "-" + (new java.util.Date()).getDate() + " " + (new java.util.Date()).getHours() + ":"
+								+ (new java.util.Date()).getMinutes() + ":" + (new java.util.Date()).getSeconds())
+				+ "'");
+		str += ", ";
+		str += (" " + dto.getUpdateDateUserId() + " ");
+		str += ", ";
+		str += ("'" + (dto.getOrderSlipDate() != null ? dto.getOrderSlipDate()
+				: ((new java.util.Date()).getYear() + 1900) + "-" + ((new java.util.Date()).getMonth() + 1) + "-"
+						+ (new java.util.Date()).getDate())
+				+ "'");
+		str += ", ";
+		str += (" " + dto.getPurchaseOrderNo() + " ");
+		str += ", ";
+		str += ("'" + "" + "'"); // history_info
+		str += ", ";
+		str += ("'" + (dto.getPrintCheckFlag() != null ? dto.getPrintCheckFlag() : "") + "'");
+		str += ", ";
+		str += ("'" + dto.getAddressNxt2() + "'");
+		str += ", ";
+		str += ("'" + dto.getSysDomesticImportId() + "'");
+		str += ")";
+		return str;
+	}
+	//<---
 	/**
 	 * 伝票情報を格納します
 	 *

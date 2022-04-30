@@ -464,8 +464,7 @@ public class DomesticImportUpdateService extends DomesticExhibitionImportService
 				managementCdSet.add(itemCode.toLowerCase());
 			}
 		}
-
-		System.out.println(managementCdSet);
+		//System.out.println(managementCdSet);
 		DomesticExhibitionService domesticService = new DomesticExhibitionService();
 		List<DomesticExhibitionDTO> domesticExhibitionDtoList = domesticService.getDomesticExhibitionDTOList(managementCdSet);
 
