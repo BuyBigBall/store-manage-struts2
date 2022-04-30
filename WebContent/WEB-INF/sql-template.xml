@@ -14318,6 +14318,27 @@
 			SYS_MANAGEMENT_ID = ${sysManagementId}
 	</sql-template>
 
+	<sql-template id="UPD_DOMESTICEXHIBITION_BY_CODE">
+		UPDATE
+			EXHIBIT_MANAGE
+		SET
+			SYS_MAKER_ID = ${sysMakerId}
+			,MAKER_CODE = ${makerCode}
+			,ITEM_NM = ${itemNm}
+			,WHOLSESALER_NM = ${wholsesalerNm}
+			,LIST_PRICE = ${listPrice}
+			,ITEM_RATE_OVER = ${itemRateOver}
+			,POSTAGE = ${postage}
+			,PURCHASING_COST = ${purchasingCost}
+			,OPEN_PRICE_FLG = ${openPriceFlg}
+			,UPDATE_DATE = current_timestamp
+			,UPDATE_USER_ID = ${updateUserId}
+			,DEPARTMENT_NM = ${departmentNm}
+		WHERE
+			delete_flag = 0 AND
+			MANAGEMENT_CODE = ${managementCode}
+	</sql-template>
+	
 	<sql-template id="UPD_DOMESTICEXHIBITION_ITEM_CODE">
 		UPDATE
 			EXHIBIT_MANAGE
