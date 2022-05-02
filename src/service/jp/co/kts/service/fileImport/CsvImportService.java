@@ -2,6 +2,9 @@ package jp.co.kts.service.fileImport;
 
 import java.io.Console;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,6 +21,12 @@ import org.apache.struts.upload.FormFile;
 
 import jp.co.keyaki.cleave.fw.core.ActionContext;
 import jp.co.keyaki.cleave.fw.dao.DaoException;
+
+import jp.co.keyaki.cleave.fw.dao.ConnectionManager;
+import jp.co.keyaki.cleave.fw.dao.DaoMessageDefine;
+import jp.co.keyaki.cleave.fw.dao.jdbc.JdbcUtils;
+import jp.co.kts.dao.mst.DomesticSlipDAO;
+
 import jp.co.keyaki.cleave.util.csv.CsvConfig;
 import jp.co.keyaki.cleave.util.csv.CsvContext;
 import jp.co.keyaki.cleave.util.csv.CsvReader;
@@ -555,10 +564,11 @@ public class CsvImportService {
 
 			//伝票の作成
 			DomesticOrderService dao = new DomesticOrderService();
+			
 			// speed session-block
-			java.lang.System.out.println("record : " + (new java.util.Date()).toLocaleString());
+			//java.lang.System.out.println("record : " + (new java.util.Date()).toLocaleString());
 
-			// ###############--> exchanging to block Insert 
+			// ###############--> exchanging to block Insert for speed up
 //			domesticDto = dao.registryDomesticOrderSlipCsv(domesticDto);
 //			long sysDomesticOrderId = domesticDto.getSysDomesticSlipId();
 			long sysDomesticOrderId = ++lDomesticId;

@@ -1,3 +1,5 @@
+-- alter table
+	ALTER TABLE "public"."mst_item" ADD COLUMN "haibang_flg" char(1) default '0' NOT NULL
 -- view_mst_item
  SELECT mst_item.sys_item_id,
     mst_item.item_code,
@@ -189,6 +191,9 @@ order by mst_item.sys_item_id
   -- create index on exhibit_manage 
 CREATE INDEX ON "public"."exhibit_manage" USING btree (
   "delete_flag"
+)
+CREATE INDEX ON "public"."exhibit_manage" USING btree (
+  lower(management_code)
 )
 
 -- rebuild_assembly_num

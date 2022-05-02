@@ -28,17 +28,23 @@ public class DomesticExhibitionImportAction extends AppBaseAction {
 
 		DomesticExhibitionImportForm form = (DomesticExhibitionImportForm) appForm;
 
-		// 出品DBインポート画面初期表示処理
+			// 出品DBインポート画面初期表示処理
 		if ("/initDomesticExhibitionImportList".equals(appMapping.getPath())) {
 			return initDmstcExhbtnImprt(appMapping, form, request);
+			
+			
 			// 出品DBExcelインポートの新規登録処理を行う
 		} else if ("/dmstcExibtExclImprt".equals(appMapping.getPath())) {
 			return dmstcExibtExclImprt(appMapping, form, request);
+			
+			
 			// 出品DBExcelインポートの更新処理を行う
 		} else if ("/dmstcExibtExclImprtUpdItm".equals(appMapping.getPath())) {
 			return dmstcExibtExclImprtUpdItm(appMapping, form, request);
 		}
 
+		
+		
 		return appMapping.findForward(StrutsBaseConst.GLOBAL_FORWARD_ERROR);
 	}
 
