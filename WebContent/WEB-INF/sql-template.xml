@@ -14335,7 +14335,7 @@
 			,UPDATE_USER_ID = ${updateUserId}
 			,DEPARTMENT_NM = ${departmentNm}
 		WHERE
-			delete_flag = 0 AND
+			delete_flag = '0' AND
 			MANAGEMENT_CODE = ${managementCode}
 	</sql-template>
 	
