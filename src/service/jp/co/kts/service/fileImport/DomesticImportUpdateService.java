@@ -177,6 +177,7 @@ public class DomesticImportUpdateService extends DomesticExhibitionImportService
 				String newCd = String.valueOf(managementCd.toLowerCase());
 				//品番が存在しない場合エラー
 				boolean existsManagementCode = false;
+//				speed check management_code
 //				for(DomesticExhibitionDTO domesticExhibitonDto : domesticExhibitionDtoList) {
 //					String oldCd = String.valueOf(domesticExhibitonDto.getManagementCode().toLowerCase());
 //					if(newCd.equals(oldCd)) {
@@ -272,7 +273,7 @@ public class DomesticImportUpdateService extends DomesticExhibitionImportService
 					errorIndex++;
 					continue;
 				}
-
+//				speed check id
 //				//システム管理IDの取得
 //				for(DomesticExhibitionDTO domesticExhibitonDto : domesticExhibitionDtoList) {
 //					if(managementCd.equals(domesticExhibitonDto.getManagementCode())) {
@@ -297,6 +298,7 @@ public class DomesticImportUpdateService extends DomesticExhibitionImportService
 				errorIndex++;
 			}
 
+			int idx = 0;
 			//出品DB更新処理
 			DomesticExhibitionDAO dao = new DomesticExhibitionDAO();
 			for (DomesticExhibitionDTO domesticExhibitionDto : domesticExhibitionList) {
@@ -307,6 +309,7 @@ public class DomesticImportUpdateService extends DomesticExhibitionImportService
 				//FIXME 存在しない品番はvalidate処理でチェック済みなので以下の処理でエラーメッセージを出力することはないはず・・・
 				//if (dao.updateDomesticExhibition(domesticExhibitionDto) != RESULT_UPDATE_CNT){
 				//<---
+				System.out.println(( idx++) + " . Management Code : " + domesticExhibitionDto.getManagementCode());
 				if (dao.updateDomesticExhibitionByCode(domesticExhibitionDto) != RESULT_UPDATE_CNT){
 						dto.getResult().addErrorMessage("LED00116", domesticExhibitionDto.getManagementCode());
 				}

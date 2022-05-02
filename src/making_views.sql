@@ -186,6 +186,11 @@ where mst_item.delete_flag='0' and mst_item.assembly_num- mst_item_copy1.assembl
 order by mst_item.sys_item_id
 
 
+  -- create index on exhibit_manage 
+CREATE INDEX ON "public"."exhibit_manage" USING btree (
+  "delete_flag"
+)
+
 -- rebuild_assembly_num
 CREATE OR REPLACE FUNCTION "public"."rebuild_assembly_num"()
   RETURNS "pg_catalog"."int4" AS $BODY$
