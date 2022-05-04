@@ -3,6 +3,7 @@ package jp.co.kts.service.fileImport;
 import java.io.Console;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -448,7 +449,10 @@ public class CsvImportService {
 			csvErrorDTO.getErrorMessageList().add(messageDTO);
 			return csvErrorDTO;
 		}
+		
+		
 		// speed session-block
+		Connection conn = ConnectionManager.get(ConnectionManager.DEFALUT_CONNECTION_NO);
 		String strDomesticSlipInsertQuery = "";
 		ExtendDomesticOrderSlipDTO domesticSlipDto = new ExtendDomesticOrderSlipDTO();
 		DomesticOrderSlipDTO daodto = slipDao.getMaxId();
@@ -458,7 +462,7 @@ public class CsvImportService {
 		for (int i = 0; i < csvImportList.size(); i++) {
 
 			CsvImportDTO csvImportDTO = csvImportList.get(i);
-
+			//              System.out.println(i + " , new import line 1 : " + (new java.util.Date()).getTime() +" : " + (new java.util.Date()).toLocaleString() );
 			//DBに格納する値
 			ExtendDomesticOrderSlipDTO domesticDto = setDomesticSlipDTO(csvImportDTO, itemDeliveryType);
 			List<DomesticOrderItemDTO> orderItemList = new ArrayList<DomesticOrderItemDTO>();
@@ -468,6 +472,7 @@ public class CsvImportService {
 				String shopItemCd = itemService.getItemCd(csvImportDTO.getShopItemCd());
 				if (sysItemId == 0) {
 					sysItemId = itemService.getSysItemIdFromShopCd(shopItemCd);
+					//              System.out.println(i + " , new import line  2 : " + (new java.util.Date()).getTime() +" : " + (new java.util.Date()).toLocaleString() );
 					if (sysItemId == 0) {
 						//受注番号内の1行目の格納処理
 						csvErrorDTO = setDomesticItemOrTaxOrOption(csvErrorDTO, orderItemList, csvImportDTO);
@@ -486,7 +491,7 @@ public class CsvImportService {
 				continue;
 			}
 			itemDeliveryType = csvImportDTO.getShopItemCd();
-
+			//              System.out.println(i + " , new import line  3 : " + (new java.util.Date()).getTime() +" : " + (new java.util.Date()).toLocaleString() );
 
 			//商品の後ろに送料などのデータが来る場合と
 			//単純に商品が連続する場合がある。
@@ -496,7 +501,7 @@ public class CsvImportService {
 				//商品マスタにある商品の場合何もしない
 
 				if (StringUtils.equals(domesticDto.getOrderNo(), csvImportDTOAfter.getOrderNo())) {
-
+					//              System.out.println(i + " , new import line  4 : " + (new java.util.Date()).getTime() +" : " + (new java.util.Date()).toLocaleString() );
 					if (StringUtils.equals(csvImportDTOAfter.getItemClassification(), "商品")) {
 
 						long sysItemId = itemService.getSysItemIdFromShopCd(csvImportDTOAfter.getShopItemCd());
@@ -510,7 +515,7 @@ public class CsvImportService {
 								exhibitionDto.setItemNm(csvImportDTOAfter.getItemNm());
 								exhibitionDto.setManagementCode(csvImportDTOAfter.getShopItemCd());
 								exhbyRsltDto = exhibitionDao.getDomesticItem(exhibitionDto);
-
+								//              System.out.println(i + " , new import line  5 : " + (new java.util.Date()).getTime() +" : " + (new java.util.Date()).toLocaleString() );
 								if (exhbyRsltDto == null) {
 									ErrorMessageDTO erroeMessage = new ErrorMessageDTO();
 									erroeMessage.setErrorMessage("受注番号 " + csvImportDTO.getOrderNo() + "　の品番　　" +  csvImportDTO.getShopItemCd() + "が出品DB未登録の為登録されませんでした。");
@@ -555,7 +560,7 @@ public class CsvImportService {
 					}
 				}
 			}
-
+			//              System.out.println(i + " , new import line  6 : " + (new java.util.Date()).getTime() +" : " + (new java.util.Date()).toLocaleString() );
 			//エラー判定
 			if (!csvErrorDTO.isSuccess()) {
 				csvErrorDTO.setSuccess(false);
@@ -566,20 +571,20 @@ public class CsvImportService {
 			DomesticOrderService dao = new DomesticOrderService();
 			
 			// speed session-block
-			//java.lang.System.out.println("record : " + (new java.util.Date()).toLocaleString());
+			//java.lang.System.out.println(i + " , record : " + (new java.util.Date()).getTime() +" : " + (new java.util.Date()).toLocaleString());
 
 			// ###############--> exchanging to block Insert for speed up
 //			domesticDto = dao.registryDomesticOrderSlipCsv(domesticDto);
 //			long sysDomesticOrderId = domesticDto.getSysDomesticSlipId();
 			long sysDomesticOrderId = ++lDomesticId;
 			strDomesticSlipInsertQuery = makeDomesticSlipQuery(strDomesticSlipInsertQuery, lDomesticId, domesticDto);
-			
+			//              System.out.println(i + " , new import line  7 : " + (new java.util.Date()).getTime() +" : " + (new java.util.Date()).toLocaleString() );
 			if(i%100==0)
 			{	// block ending and new block starting
 				boolean isHandleException 		= false;
 				PreparedStatement 		stmt 	= null;
-				Connection conn = ConnectionManager.get(ConnectionManager.DEFALUT_CONNECTION_NO);
-				
+//				Connection conn = ConnectionManager.get(ConnectionManager.DEFALUT_CONNECTION_NO);
+				//              System.out.println(i + " , new import line  8 : " + (new java.util.Date()).getTime() +" : " + (new java.util.Date()).toLocaleString() );
 				try {
 					stmt = conn.prepareStatement( strDomesticSlipInsertQuery );
 					//bindParameters(stmt, null );
@@ -594,7 +599,7 @@ public class CsvImportService {
 				strDomesticSlipInsertQuery = "";
 			}
 			// <--- ##########################
-
+			//              System.out.println(i + " , new import line  9 : " + (new java.util.Date()).getTime() +" : " + (new java.util.Date()).toLocaleString() );
 			//国内注文商品の作成
 			resultCnt += dao.registryDomesticOrderItemList(orderItemList, sysDomesticOrderId);
 		}
@@ -603,7 +608,7 @@ public class CsvImportService {
 		{
 			boolean isHandleException 		= false;
 			PreparedStatement 		stmt 	= null;
-			Connection conn = ConnectionManager.get(ConnectionManager.DEFALUT_CONNECTION_NO);
+//			Connection conn = ConnectionManager.get(ConnectionManager.DEFALUT_CONNECTION_NO);
 			
 			try {
 				stmt = conn.prepareStatement( strDomesticSlipInsertQuery );
@@ -618,7 +623,7 @@ public class CsvImportService {
 			}
 		}
 		//<---
-		
+		//              System.out.println("before end , new import line 10 : " + (new java.util.Date()).getTime() +" : " + (new java.util.Date()).toLocaleString() );
 		//国内商品が一件もない場合
 		if (csvErrorDTO.getTrueCount() == 0) {
 			messageDTO.setErrorMessage("国内商品が存在しないCSVファイルです。");
@@ -633,7 +638,7 @@ public class CsvImportService {
 		if (csvErrorDTO.getErrorMessageList().size() > 0) {
 			csvErrorDTO.setSuccess(false);
 		}
-
+		//              System.out.println("end , new import line 11 : " + (new java.util.Date()).getTime() +" : " + (new java.util.Date()).toLocaleString() );
 		return csvErrorDTO;
 	}
 	// speed session-block
@@ -1163,7 +1168,7 @@ public class CsvImportService {
 			
 			List<ExtendSetItemDTO> parentList = itemDAO.getParentSetItemList(dto.getSysItemId());
 			if (parentList != null) {
-				System.out.println("Parent Item's id, code " + parentList.get(0).getSysItemId() + ":" + parentList.get(0).getItemCode());
+				//              System.out.println("Parent Item's id, code " + parentList.get(0).getSysItemId() + ":" + parentList.get(0).getItemCode());
 //				errorMessageGreenMap.put(itemCode, "注文番号「" + orderNo1 + "」: セット品番「" + parentList.get(0).getItemCode() +
 //						"」 品番「" + itemCode + "」の商品は廃盤商品の為キープされませんでした。");
 			}
@@ -1191,7 +1196,7 @@ public class CsvImportService {
 			
 			List<ExtendSetItemDTO> parentList = itemDAO.getParentSetItemList(dto.getSysItemId());
 			if (parentList != null) {
-				System.out.println("Parent Item's id, code " + parentList.get(0).getSysItemId() + ":" + parentList.get(0).getItemCode());
+				//              System.out.println("Parent Item's id, code " + parentList.get(0).getSysItemId() + ":" + parentList.get(0).getItemCode());
 //				errorMessageGreenMap.put(itemCode, "注文番号「" + orderNo1 + "」: セット品番「" + parentList.get(0).getItemCode() +
 //						"」 品番「" + itemCode + "」の商品は廃盤商品の為キープされませんでした。");
 			}
@@ -1359,7 +1364,7 @@ public class CsvImportService {
 				
 				List<ExtendSetItemDTO> parentList = itemDAO.getParentSetItemList(csvItemList.get(i).getSysItemId());
 				if (parentList != null) {
-					System.out.println("Parent Item's id, code " + parentList.get(0).getSysItemId() + ":" + parentList.get(0).getItemCode());
+					//              System.out.println("Parent Item's id, code " + parentList.get(0).getSysItemId() + ":" + parentList.get(0).getItemCode());
 //					errorMessageGreenMap.put(itemCode, "注文番号「" + orderNo1 + "」: セット品番「" + parentList.get(0).getItemCode() +
 //							"」 品番「" + itemCode + "」の商品は廃盤商品の為キープされませんでした。");
 				}
@@ -1381,14 +1386,14 @@ public class CsvImportService {
 
 				// KTS倉庫キープ分
 				//商品単位のキープリスト取得
-				System.out.println("STEP 1");
+				//              System.out.println("STEP 1");
 				List<ExtendKeepDTO> getKeepList = new ArrayList<>();			
 				MstItemDTO dto = itemDAO.getMstItemForKeep(csvItemList.get(i).getShopItemCd());
 				int orgkeepIncreaseStep = 0;
 				int changedKeepCount = 0;
 				int totalStockNum = itemDAO.getMstItemDTO(dto.getSysItemId()).getTotalStockNum();
 
-				System.out.println("STEP 1 : Normal Product");
+				//              System.out.println("STEP 1 : Normal Product");
 				System.out.println("Found : OrderNo = " + csvItemList.get(i).getOrderNo() + 
 						" ItemId = " + csvItemList.get(i).getSysItemId() + 
 						" TotalStockNum = " + totalStockNum + 

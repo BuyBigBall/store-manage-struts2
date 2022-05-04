@@ -2411,6 +2411,16 @@
 		SYS_SALES_SLIP_ID =
 		${sysSalesSlipId}
 	</sql-template>
+	
+	<sql-template id="UPD_SALES_SLIP_TRANS_SLIPNO_BY_ORDERNO">
+		UPDATE SALES_SLIP SET
+				 SLIP_NO = ${SlipNo}
+				,TRANSPORT_CORPORATION_SYSTEM = ${TransportCorporationSystem}
+				,UPDATE_USER_ID = ${updateUserId}
+		WHERE
+				ORDER_NO = ${OrderNo}
+	</sql-template>
+	
 	<sql-template id="UPD_SALES_SLIP_POSTAGE">
 		UPDATE SALES_SLIP SET
 		POSTAGE = ${postage}
@@ -7742,6 +7752,11 @@
 		SELECT PALLASSEMBLYNUM(${updateUserId});
 	</sql-template>
 
+	<!-- 	全セット商品組立可数更新関数 -->
+	<sql-template id="SELECT_REBUILDASSEMBLYNUM">
+		SELECT REBUILD_ASSEMBLY_NUM(${updateUserId});
+	</sql-template>
+
 
 	<sql-template id="PARENT_SET_ITEM_LIST">
 		SELECT
@@ -9293,6 +9308,19 @@
 		,YUSO_SHIJI2 = ${yusoShiji2}
 		WHERE
 		SYS_CORPORATE_SALES_SLIP_ID = ${sysCorporateSalesSlipId}
+	</sql-template>
+
+
+	<sql-template id="UPD_CORP_SALES_TRANS_SLIPNO_SLIP_BY_ORDERNO">
+		UPDATE CORPORATE_SALES_SLIP SET
+				SLIP_NO = ${SlipNo}
+				,TRANSPORT_CORPORATION_SYSTEM = ${TransportCorporationSystem}
+				,UPDATE_USER_ID = ${updateUserId}
+				<if-not-empty varName="receiveDate">
+					,RECEIVE_DATE = ${receiveDate}
+				</if-not-empty>
+		WHERE
+				ORDER_NO = ${OrderNo}
 	</sql-template>
 
 	<sql-template id="UPD_CORP_SALES_SLIP_FLG">

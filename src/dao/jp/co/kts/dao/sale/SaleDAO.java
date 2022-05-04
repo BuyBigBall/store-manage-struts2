@@ -547,6 +547,18 @@ public class SaleDAO extends BaseDAO {
 		return update("UPD_SALES_SLIP", parameters);
 	}
 
+	public int updateSalesSlipTransAndSlipnoByOrderno(String strTransportCorporationSystem, String strSlipNo, String strOrderNo) throws DaoException {
+
+		SQLParameters parameters = new SQLParameters();
+		parameters.addParameter("OrderNo", strOrderNo);
+		parameters.addParameter("SlipNo", strSlipNo);
+		parameters.addParameter("TransportCorporationSystem", strTransportCorporationSystem);
+
+		UserInfo userInfo = ActionContext.getLoginUserInfo();
+		parameters.addParameter("updateUserId", userInfo.getUserId());
+		return update("UPD_SALES_SLIP_TRANS_SLIPNO_BY_ORDERNO", parameters);
+	}
+
 	public int updateSalesSlipPostage(ExtendSalesSlipDTO dto) throws DaoException {
 
 		SQLParameters parameters = new SQLParameters();

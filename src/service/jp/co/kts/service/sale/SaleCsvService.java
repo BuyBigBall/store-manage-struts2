@@ -475,46 +475,61 @@ public class SaleCsvService extends SaleService {
 
 			CsvImportDTO csvImportDTO = csvImportList.get(i);
 
-			// DBに格納する値 : for ExtendSalesSlipDTO
-			ExtendSalesSlipDTO salesSlipDTO = getExtendSalesSlip(csvImportDTO.getOrderNo());
-			if (salesSlipDTO != null) {
-				// UPDATE : ExtendSalesSlipDTO ==== save jis, transport system.
-				salesSlipDTO.setTransportCorporationSystem(csvImportDTO.getTransportCorporationSystem());
-				salesSlipDTO.setSlipNo(csvImportDTO.getSlipNo());
-	
-				long sysSalesSlipId = getSysSalesSlipId(salesSlipDTO.getOrderNo());
-				salesSlipDTO.setSysSalesSlipId(sysSalesSlipId);
-
-				System.out.println("Found SaleSlip DTO: (id, orderno, slipno)" + 
-							sysSalesSlipId + ":" + salesSlipDTO.getOrderNo() + ":" + salesSlipDTO.getSlipNo());
-				
-				SaleDAO saleDAO = new SaleDAO();
-				errorDTO.setTrueCount(errorDTO.getTrueCount() + saleDAO.updateSalesSlip(salesSlipDTO));
-			}
+			//			spped up updating
+//			// DBに格納する値 : for ExtendSalesSlipDTO
+//			ExtendSalesSlipDTO salesSlipDTO = getExtendSalesSlip(csvImportDTO.getOrderNo());
+//			if (salesSlipDTO != null) {
+//				// UPDATE : ExtendSalesSlipDTO ==== save jis, transport system.
+//				salesSlipDTO.setTransportCorporationSystem(csvImportDTO.getTransportCorporationSystem());
+//				salesSlipDTO.setSlipNo(csvImportDTO.getSlipNo());
+//	
+//				long sysSalesSlipId = getSysSalesSlipId(salesSlipDTO.getOrderNo());
+//				salesSlipDTO.setSysSalesSlipId(sysSalesSlipId);
+//
+//				System.out.println("Found SaleSlip DTO: (id, orderno, slipno)" + 
+//							sysSalesSlipId + ":" + salesSlipDTO.getOrderNo() + ":" + salesSlipDTO.getSlipNo());
+//				
+//				SaleDAO saleDAO = new SaleDAO();
+//				errorDTO.setTrueCount(errorDTO.getTrueCount() + saleDAO.updateSalesSlip(salesSlipDTO));
+//			}
+			SaleDAO saleDAO = new SaleDAO();
+			errorDTO.setTrueCount(errorDTO.getTrueCount() + saleDAO.updateSalesSlipTransAndSlipnoByOrderno(	
+							csvImportDTO.getTransportCorporationSystem(),
+							csvImportDTO.getSlipNo(),
+							csvImportDTO.getOrderNo()
+						));
+			//<--------
 			
-			// For CorporateSalesSlipDto
-			List<ExtendCorporateSalesSlipDTO> list = getCorporateSaleSlipByOrderNo(csvImportDTO.getOrderNo());
-			if (list != null) {
-				
-				for (int j=0; j< list.size(); j++) {
-					ExtendCorporateSalesSlipDTO corpSalesSlipDTO = list.get(j);
-					
-					// update : ExtendCorporateSalesSlipDTO ==== save jis, transport system
-					corpSalesSlipDTO.setTransportCorporationSystem(csvImportDTO.getTransportCorporationSystem());
-					corpSalesSlipDTO.setSlipNo(csvImportDTO.getSlipNo());
-					
-					long sysCorpSalesSlipId = corpSalesSlipDTO.getSysCorporateSalesSlipId();
-					corpSalesSlipDTO.setSysCorporateSalesSlipId(sysCorpSalesSlipId);
-					
-					System.out.println("Found CorpSaleSlip DTO: (id, orderno, slipno)" + 
-							sysCorpSalesSlipId + ":" + corpSalesSlipDTO.getOrderNo() + ":" + corpSalesSlipDTO.getSlipNo());
+			//			speed up updating
+//			// For CorporateSalesSlipDto
+//			List<ExtendCorporateSalesSlipDTO> list = getCorporateSaleSlipByOrderNo(csvImportDTO.getOrderNo());
+//			if (list != null) {
+//				
+//				for (int j=0; j< list.size(); j++) {
+//					ExtendCorporateSalesSlipDTO corpSalesSlipDTO = list.get(j);
+//					
+//					// update : ExtendCorporateSalesSlipDTO ==== save jis, transport system
+//					corpSalesSlipDTO.setTransportCorporationSystem(csvImportDTO.getTransportCorporationSystem());
+//					corpSalesSlipDTO.setSlipNo(csvImportDTO.getSlipNo());
+//					
+//					long sysCorpSalesSlipId = corpSalesSlipDTO.getSysCorporateSalesSlipId();
+//					corpSalesSlipDTO.setSysCorporateSalesSlipId(sysCorpSalesSlipId);
+//					
+//					System.out.println("Found CorpSaleSlip DTO: (id, orderno, slipno)" + 
+//							sysCorpSalesSlipId + ":" + corpSalesSlipDTO.getOrderNo() + ":" + corpSalesSlipDTO.getSlipNo());
+//
+//					CorporateSaleDAO corpSaleDAO = new CorporateSaleDAO();
+//					errorDTO.setTrueCount(errorDTO.getTrueCount() + corpSaleDAO.updateCorporateSalesSlip(corpSalesSlipDTO));					
+//				}
+//			}
 
-					CorporateSaleDAO corpSaleDAO = new CorporateSaleDAO();
-					errorDTO.setTrueCount(errorDTO.getTrueCount() + corpSaleDAO.updateCorporateSalesSlip(corpSalesSlipDTO));					
-				}
-				
-			}
-
+			CorporateSaleDAO corpSaleDAO = new CorporateSaleDAO();
+			errorDTO.setTrueCount(errorDTO.getTrueCount() + corpSaleDAO.updateCorporateSalesSlipTransAndSlipnoByOrderNo(
+					csvImportDTO.getTransportCorporationSystem(),
+					csvImportDTO.getSlipNo(),
+					csvImportDTO.getOrderNo()
+					));					
+			//<-----------
 		}
 		return errorDTO;
 	}

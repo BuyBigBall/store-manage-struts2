@@ -46,6 +46,8 @@ public class CsvImportAction extends AppBaseAction{
 		//受注データ取込（複数ファイル）
 		} else if ("/csvListImport".equals(appMapping.getPath())) {
 			return  csvListImport(appMapping, form, request);
+			
+			
 		//配送データ取込初期処理
 		} else if ("/initDeliveryCsvImport".equals(appMapping.getPath())) {
 			return  initDeliveryCsvImport(appMapping, form, request);
@@ -61,6 +63,8 @@ public class CsvImportAction extends AppBaseAction{
 		//配送データ取込：送り状番号付与(複数ファイル)
 		} else if ("/addSlipNoDeliveryCsvImportList".equals(appMapping.getPath())) {
 			return addSlipNoDeliveryCsvImportList(appMapping, form, request);
+			
+			
 		//助ネコインポート：国内注文データ取込画面初期処理
 		} else if ("/initDomesticCsvImport".equals(appMapping.getPath())) {
 			return initDomesticCsvImport(appMapping, form, request);
@@ -70,6 +74,8 @@ public class CsvImportAction extends AppBaseAction{
 		//助ネコインポート：国内注文データインポート処理(複数ファイル)
 		} else if ("/csvDomesticListImport".equals(appMapping.getPath())) {
 			return  csvDomesticListImport(appMapping, form, request);
+			
+			
 		//助ネコインポート：在庫数キープインポート初期処理
 		} else if ("/initKeepCsvImport".equals(appMapping.getPath())) {
 			return initKeepCsvImport(appMapping, form, request);
