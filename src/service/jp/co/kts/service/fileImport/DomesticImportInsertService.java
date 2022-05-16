@@ -392,9 +392,9 @@ public class DomesticImportInsertService extends DomesticExhibitionImportService
 		//構成商品最大値
 		long maxSysSetManagementId = dao.getSysSetManagementId() + 1;
 
-		
-		
 		int errorIndex = ServiceConst.UPLOAD_EXCEL_INIT_ROWS + 1;
+
+
 
 		/****************************************
 		 * 構成商品のsys_item_idを取得する。
@@ -439,8 +439,6 @@ public class DomesticImportInsertService extends DomesticExhibitionImportService
 			managementCodeIDMap.put(deDto.getManagementCode(), deDto.getSysManagementId());
 		}
 
-		
-		
 
 		for (int i = 0; i < setItemList.size(); i++) {
 			ExtendSetDomesticExhibitionDto setDto = new ExtendSetDomesticExhibitionDto();

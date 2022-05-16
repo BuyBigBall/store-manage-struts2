@@ -57,6 +57,10 @@ public class UserAction extends AppBaseAction {
 			 return registryUser(appMapping, form, request);
 		}else if ("/saveExtraRuleDetailByUserId".equals(appMapping.getPath())) {
 			 return saveExtraRuleDetailByUserId(appMapping, form, request, response);
+		}else if ("/returnUserList".equals(appMapping.getPath())) {
+			 return returnUserList(appMapping, form, request);
+		}else if ("/editDetailList".equals(appMapping.getPath())) {
+			 return editDetailList(appMapping, form, request);
 		}
 
 
@@ -74,6 +78,8 @@ public class UserAction extends AppBaseAction {
 		 form.setRuleList(ruleService.getRulesList());
 		 
 		 form.setIsEditModeAll(0);
+		 form.setRuleId(0);
+		 form.setSelectRowId(-1);
 
 		 return appMapping.findForward(StrutsBaseConst.FORWARD_NAME_SUCCESS);
 	 }
@@ -154,6 +160,7 @@ public class UserAction extends AppBaseAction {
 		form.setAlertType("2");
 		form.setIsEditModeAll(0);
 		form.setSysUserId(0);
+		form.setSelectRowId(-1);
 		return userList(appMapping, form, request);
 	 }
 	 
@@ -170,6 +177,8 @@ public class UserAction extends AppBaseAction {
 				if(!ruleDto.getChildrenRuleCheckedFlag().equals("-1")) {
 					ruleService.updateExtraRule(ruleDto, userDto.getSysUserId());
 				}
+				if(ruleDto.getChildCount() < 2)
+					ruleService.updateExtraRule(ruleDto, userDto.getSysUserId());
 			}
 			for (MstMasterDTO masterDto : userDto.getMstMasterList()) {
 				if(!masterDto.getChildrenMasterCheckedFlag().equals("-1")) {
@@ -197,6 +206,7 @@ public class UserAction extends AppBaseAction {
 		
 		 form.setAlertType("2");
 		 form.setIsEditModeAll(0);
+		 form.setSelectRowId(-1);
 		 return userList(appMapping, form, request);
 	 }
 	 
@@ -230,7 +240,7 @@ public class UserAction extends AppBaseAction {
 		MstUserDTO userDTO = new MstUserDTO();
 		form.setUserDTO(userDTO);
 		form.setAlertType("3");
-
+		form.setSelectRowId(-1);
 		//削除後の一覧を再取得する
 		form.setUserList(service.getUserList());
 
@@ -309,18 +319,33 @@ public class UserAction extends AppBaseAction {
 			}
 		}
 		return null;
-//		if (itemList.size() == 0) {
-//			PrintWriter printWriter = response.getWriter();
-//			printWriter.print(JSON.encode(""));
-//		} else {
-//			response.setCharacterEncoding("UTF-8");
-//			PrintWriter printWriter = response.getWriter();
-//			printWriter.print(JSON.encode("success"));
-//		}
-//		response.setCharacterEncoding("UTF-8");
-//		PrintWriter printWriter = response.getWriter();
-//		printWriter.print(JSON.encode("success"));
-//		return null;
 	 }
+	 protected ActionForward returnUserList(AppActionMapping appMapping, UserForm form,
+	     HttpServletRequest request) throws Exception {
+	
+		 UserService service = new UserService();
+		RulesService ruleService = new RulesService();
+		
+		List<MstUserDTO> userList = service.getUserList();
+		form.setUserList(userList);
+		form.setRuleList(ruleService.getRulesList());
+		
+		return appMapping.findForward(StrutsBaseConst.FORWARD_NAME_SUCCESS);
+	}
+	 
+	 protected ActionForward editDetailList(AppActionMapping appMapping, UserForm form,
+	            HttpServletRequest request) throws Exception {
 
+		 UserService service = new UserService();
+		 RulesDetailService rService = new RulesDetailService();
+		 if(form.getIsEditModeSingle() > 1) {
+			 List<MstMasterDTO> detailList = service.getMasterList(form.getSysUserId());
+			 form.setMdetailList(detailList);	 
+		 }
+		 else {
+			 form.setRdetailList(rService.getRuleDetailByUserId(form.getRuleId(), form.getSysUserId()));	 
+		 }
+		 
+		 return appMapping.findForward(StrutsBaseConst.FORWARD_NAME_SUCCESS);
+	 }
 }

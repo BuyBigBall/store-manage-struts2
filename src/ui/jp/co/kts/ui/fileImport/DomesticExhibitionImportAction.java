@@ -23,49 +23,43 @@ import jp.co.kts.ui.web.struts.WebConst;
 public class DomesticExhibitionImportAction extends AppBaseAction {
 
 	@Override
-	protected ActionForward doExecute(AppActionMapping appMapping, AppBaseForm appForm, HttpServletRequest request,
+	protected ActionForward doExecute(AppActionMapping appMapping,
+			AppBaseForm appForm, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 
 		DomesticExhibitionImportForm form = (DomesticExhibitionImportForm) appForm;
 
-			// 出品DBインポート画面初期表示処理
+		//出品DBインポート画面初期表示処理
 		if ("/initDomesticExhibitionImportList".equals(appMapping.getPath())) {
 			return initDmstcExhbtnImprt(appMapping, form, request);
-			
-			
-			// 出品DBExcelインポートの新規登録処理を行う
+			//出品DBExcelインポートの新規登録処理を行う
 		} else if ("/dmstcExibtExclImprt".equals(appMapping.getPath())) {
 			return dmstcExibtExclImprt(appMapping, form, request);
-			
-			
-			// 出品DBExcelインポートの更新処理を行う
+			//出品DBExcelインポートの更新処理を行う
 		} else if ("/dmstcExibtExclImprtUpdItm".equals(appMapping.getPath())) {
 			return dmstcExibtExclImprtUpdItm(appMapping, form, request);
 		}
 
-		
-		
 		return appMapping.findForward(StrutsBaseConst.GLOBAL_FORWARD_ERROR);
 	}
 
 	/**
 	 * 出品DBインポート画面初期表示処理
-	 * 
 	 * @param appMapping
 	 * @param form
 	 * @param request
 	 * @return
 	 */
-	private ActionForward initDmstcExhbtnImprt(AppActionMapping appMapping, DomesticExhibitionImportForm form,
-			HttpServletRequest request) {
+	private ActionForward initDmstcExhbtnImprt(AppActionMapping appMapping,
+			DomesticExhibitionImportForm form, HttpServletRequest request) {
 
-		// 更新・削除から呼び出されていない場合、メッセージを初期化
+		//更新・削除から呼び出されていない場合、メッセージを初期化
 		if (!form.getMessageFlg().equals("1")) {
 			RegistryMessageDTO messageDTO = new RegistryMessageDTO();
-			// メッセージ初期化
+			//メッセージ初期化
 			form.setRegistryDto(messageDTO);
 		}
-		// メッセージフラグを切っておく
+		//メッセージフラグを切っておく
 		form.setMessageFlg("0");
 
 		return appMapping.findForward(StrutsBaseConst.FORWARD_NAME_SUCCESS);
@@ -73,17 +67,16 @@ public class DomesticExhibitionImportAction extends AppBaseAction {
 
 	/**
 	 * 出品DBExcelインポートの更新処理を行う
-	 * 
 	 * @param appMapping
 	 * @param form
 	 * @param request
 	 * @return
 	 * @throws Exception
 	 */
-	private ActionForward dmstcExibtExclImprtUpdItm(AppActionMapping appMapping, DomesticExhibitionImportForm form,
-			HttpServletRequest request) throws Exception {
+	private ActionForward dmstcExibtExclImprtUpdItm(AppActionMapping appMapping,
+			DomesticExhibitionImportForm form, HttpServletRequest request) throws Exception {
 
-		// インスタンス生成
+		//インスタンス生成
 		DomesticExhibitionImportService service = new DomesticImportUpdateService();
 		ActionErrorExcelImportDTO dto = new ActionErrorExcelImportDTO();
 		RegistryMessageDTO messageDTO = new RegistryMessageDTO();
@@ -92,10 +85,10 @@ public class DomesticExhibitionImportAction extends AppBaseAction {
 
 		try {
 
-			// ExcelファイルをDTOに取込(validateチェック含む)
+			//ExcelファイルをDTOに取込(validateチェック含む)
 			dto = service.validate(form.getFileUp());
 
-			// バリデートチェックにかかっている場合は画面上にエラーを表示
+			//バリデートチェックにかかっている場合は画面上にエラーを表示
 			if (!dto.getResult().isSuccess()) {
 				List<ErrorMessage> messages = new ArrayList<ErrorMessage>();
 				messages.addAll(dto.getResult().getErrorMessages());
@@ -135,17 +128,16 @@ public class DomesticExhibitionImportAction extends AppBaseAction {
 
 	/**
 	 * 出品DBExcelインポートの新規登録処理を行う
-	 * 
 	 * @param appMapping
 	 * @param form
 	 * @param request
 	 * @return
 	 * @throws Exception
 	 */
-	private ActionForward dmstcExibtExclImprt(AppActionMapping appMapping, DomesticExhibitionImportForm form,
-			HttpServletRequest request) throws Exception {
+	private ActionForward dmstcExibtExclImprt(AppActionMapping appMapping,
+			DomesticExhibitionImportForm form, HttpServletRequest request) throws Exception {
 
-		// インスタンス生成
+		//インスタンス生成
 		DomesticExhibitionImportService service = new DomesticImportInsertService();
 		ActionErrorExcelImportDTO dto = new ActionErrorExcelImportDTO();
 		RegistryMessageDTO messageDTO = new RegistryMessageDTO();
@@ -153,10 +145,10 @@ public class DomesticExhibitionImportAction extends AppBaseAction {
 		begin();
 		try {
 
-			// ExcelファイルをDTOに取込(validateチェック含む)
+			//ExcelファイルをDTOに取込(validateチェック含む)
 			dto = service.validate(form.getFileUp());
 
-			// バリデートチェックにかかっている場合は画面上にエラーを表示
+			//バリデートチェックにかかっている場合は画面上にエラーを表示
 			if (!dto.getResult().isSuccess()) {
 				List<ErrorMessage> messages = new ArrayList<ErrorMessage>();
 				messages.addAll(dto.getResult().getErrorMessages());

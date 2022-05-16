@@ -407,6 +407,21 @@ public class ExportCorporatePickListServiceNew {
 		else 
 			pdfContentByte.showText("");
 
+		// 表示位置の設定
+		pdfContentByte.setTextMatrix(200, 660);
+
+		// 表示する文字列の設定
+		pdfContentByte.showText("日付");
+
+		// 表示位置の設定
+		pdfContentByte.setTextMatrix(240, 660);
+
+		// 表示する文字列の設定
+		if (slipDto.getOrderDate() != null)
+			pdfContentByte.showText(slipDto.getOrderDate() + "," + TimeZone.getTimeZone("Asia/Tokyo").getDisplayName());
+		else 
+			pdfContentByte.showText("");
+		
 		{
 			// Get SlipNo 
 			
@@ -982,6 +997,22 @@ public class ExportCorporatePickListServiceNew {
 		//納品書新規レイアウト
 		//フォントとサイズの設定
 		pdfContentByte.setFontAndSize(baseFont, 10);
+		
+
+
+		// 表示位置の設定
+		pdfContentByte.setTextMatrix(440, 788);
+		// 表示する文字列の設定
+		pdfContentByte.showText("受注番号");
+
+		pdfContentByte.setTextMatrix(486, 788);
+
+		// 表示する文字列の設定
+		if (slipDto.getOrderDate() != null)
+			pdfContentByte.showText(slipDto.getOrderNo());
+		else 
+			pdfContentByte.showText("");
+		
 		ExtendMstClientDTO client = new ClientService().getDispClient(slipDto.getSysClientId());
 
 		boolean bremboFlag = false;

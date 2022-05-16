@@ -2,6 +2,8 @@ package jp.co.kts.service.mst;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import jp.co.keyaki.cleave.fw.core.ActionContext;
 import jp.co.keyaki.cleave.fw.core.security.UserInfo;
 import jp.co.keyaki.cleave.fw.core.util.CipherUtil;
@@ -27,16 +29,23 @@ public class RulesDetailService {
 	private static final String RULE_LIST_CHECK_FLG_ON = "on";
 	
 	public List<MstRulesListDTO> getRuleDetail(long ruleId) throws Exception {
-		//System.out.println(ruleId);
 		RulesDAO dao = new RulesDAO();
 		UserInfo userInfo = ActionContext.getLoginUserInfo();
 		List<MstRulesListDTO> listRulesDetail = dao.getRuleDetailInfoByUserId(ruleId, userInfo.getUserId());
-		//System.out.println(listRulesDetail);
 		for(MstRulesListDTO dto : listRulesDetail) {
 			dto.setListPass(CipherUtil.decodeString(dto.getListPass()));
 		}
 		return listRulesDetail;
 //		return dao.getRuleDetailInfoByUserId(ruleId, userInfo.getUserId());
+	}
+	
+	public List<MstRulesListDTO> getRuleDetailByUserId(long ruleId, long userId) throws Exception {
+		RulesDAO dao = new RulesDAO();
+		List<MstRulesListDTO> listRulesDetail = dao.getRuleDetailInfoByUserId(ruleId, userId);
+		for(MstRulesListDTO dto : listRulesDetail) {
+			dto.setListPass(CipherUtil.decodeString(dto.getListPass()));
+		}
+		return listRulesDetail;
 	}
 	
 	public MstRulesListDTO getRuleDetails(long ruleListId) throws Exception {
@@ -51,10 +60,12 @@ public class RulesDetailService {
 		int resultCnt = 0;
 		RulesDAO dao = new RulesDAO();
 		for (MstRulesListDTO ruleDto : dto) {
+			if(StringUtils.isBlank(ruleDto.getItemCheckFlg())) continue;
 			if (!ruleDto.getItemCheckFlg().equals(RULE_LIST_CHECK_FLG_ON)) {
 				continue;
 			}
 			resultCnt += dao.deleteRuleListItem(ruleDto);
+			dao.deleteExtraRuleByRuleListId(ruleDto.getRuleListId(), 0);
 		}
 
 		return resultCnt;

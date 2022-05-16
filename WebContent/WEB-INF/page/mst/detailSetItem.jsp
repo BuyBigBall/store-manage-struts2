@@ -1877,7 +1877,7 @@ function commmaAddFnc() {
 									onchange="PxTextareaAdjuster(this);"
 									onblur="PxTextareaAdjuster(this);">
 								</nested:textarea></td>
-							<td ><nested:text property="totalStockNum" styleClass="w50 addTotalStockNum" maxlength="4" readonly="true"/></td>
+							<td ><nested:text property="temporaryStockNum" styleClass="w50 addTotalStockNum" maxlength="4" readonly="true"/><!-- totalStockNum --></td>
 							<td><a class="button_small_main searchAddItem"
 								href="javascript:void(0)">商品検索</a>&nbsp; <a
 								class="button_small_white removeSetItemDisp"

@@ -62,8 +62,6 @@ public class CsvImportAction extends AppBaseAction{
 		//受注データ取込（複数ファイル）
 		} else if ("/csvListImport".equals(appMapping.getPath())) {
 			return  csvListImport(appMapping, form, request);
-			
-			
 		//配送データ取込初期処理
 		} else if ("/initDeliveryCsvImport".equals(appMapping.getPath())) {
 			return  initDeliveryCsvImport(appMapping, form, request);
@@ -79,8 +77,6 @@ public class CsvImportAction extends AppBaseAction{
 		//配送データ取込：送り状番号付与(複数ファイル)
 		} else if ("/addSlipNoDeliveryCsvImportList".equals(appMapping.getPath())) {
 			return addSlipNoDeliveryCsvImportList(appMapping, form, request);
-			
-			
 		//助ネコインポート：国内注文データ取込画面初期処理
 		} else if ("/initDomesticCsvImport".equals(appMapping.getPath())) {
 			return initDomesticCsvImport(appMapping, form, request);
@@ -90,8 +86,6 @@ public class CsvImportAction extends AppBaseAction{
 		//助ネコインポート：国内注文データインポート処理(複数ファイル)
 		} else if ("/csvDomesticListImport".equals(appMapping.getPath())) {
 			return  csvDomesticListImport(appMapping, form, request);
-			
-			
 		//助ネコインポート：在庫数キープインポート初期処理
 		} else if ("/initKeepCsvImport".equals(appMapping.getPath())) {
 			return initKeepCsvImport(appMapping, form, request);
@@ -973,14 +967,11 @@ public class CsvImportAction extends AppBaseAction{
 
 		//CSVの情報をリストに格納
 		if (form.getCorporationId() != 0) {
-			form.setCsvErrorDTO(service.importDomesticFile(form.getCorporationId(), form.getFileUp(), form.getCsvImportList()));
-		}
-
-		// CSVファイルから国内注文書の作成
-		if (form.getCsvErrorDTO().isSuccess()) {
-
-			form.setCsvErrorDTO(service.csvToDomesticSlip(form.getCsvImportList()));
-			form.setTrueCount(form.getCsvErrorDTO().getTrueCount());
+			//form.setCsvErrorDTO(service.importDomesticFile(form.getCorporationId(), form.getFileUp(), form.getCsvImportList()));
+			form.setCsvErrorDTO(
+					service.importDomesticOrderStockFile(form.getCorporationId(), form.getFileUp(), form.getCsvOrderStockImportList()));
+			
+			
 		}
 
 		messageDTO.setMessageFlg("0");
@@ -1050,18 +1041,12 @@ public class CsvImportAction extends AppBaseAction{
 		idx = 0;
 		for (CsvInputDTO dto: form.getCsvInputList()) {
 
-			form.getCsvErrorList().add(service.importDomesticFile(corporationIds[idx++], dto.getFileUp(),form.getCsvImportList()));
+			//form.getCsvErrorList().add(service.importDomesticFile(corporationIds[idx++], dto.getFileUp(),form.getCsvImportList()));
+			form.getCsvErrorList().add(
+					service.importDomesticOrderStockFile(corporationIds[idx++], dto.getFileUp(), form.getCsvOrderStockImportList())
+					);
 		}
 
-		//国内注文書作成
-		SaleCsvService saleCsvService = new SaleCsvService();
-		List<List<CsvImportDTO>> csvImportLists = saleCsvService.csvToSaleSlipList(form.getCsvImportList());
-		for (List<CsvImportDTO> list: csvImportLists) {
-
-			ErrorDTO dto = service.csvToDomesticSlip(list);
-			form.getCsvErrorList().add(dto);
-			form.setTrueCount(dto.getTrueCount() + form.getTrueCount());
-		}
 
 		messageDTO.setMessageFlg("0");
 		messageDTO.setMessage("インポートが完了しました。");
