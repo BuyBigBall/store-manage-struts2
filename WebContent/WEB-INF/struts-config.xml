@@ -564,7 +564,7 @@
 
 
 		<!-- ============== CSVインポート =============== -->
-
+		
 		<action path="/initCsvImport" type="jp.co.kts.ui.fileImport.CsvImportAction"
 			name="csvImportForm" scope="session" validate="false">
 			<set-property property="nonSecureAction" value="true" />
@@ -2810,7 +2810,31 @@
 			<forward name="success" path="/WEB-INF/page/import/domesticCsvImport.jsp" />
 			<forward name="failure" path="/WEB-INF/page/import/domesticCsvImport.jsp" />
 		</action>
+		
+		<!-- ============== 国内注文入荷予定日取込 CSVインポート =============== -->
+		<action path="/initDomesticOrderStockCsvImport" type="jp.co.kts.ui.fileImport.CsvImportAction"
+			name="csvImportForm" scope="session" validate="false">
+			<set-property property="nonSecureAction" value="true" />
+			<set-property property="tokenType" value="nocheck" />
+			<forward name="success" path="/WEB-INF/page/import/domesticOrderStockCsvImport.jsp" />
+		</action>
+		<action path="/domesticOrderStockCsvImport" type="jp.co.kts.ui.fileImport.CsvImportAction"
+			name="csvImportForm" scope="session" validate="false">
+			<set-property property="nonSecureAction" value="false" />
+			<set-property property="tokenType" value="nocheck" />
+			<forward name="success" path="/WEB-INF/page/import/domesticOrderStockCsvImport.jsp" />
+			<forward name="failure" path="/WEB-INF/page/import/domesticOrderStockCsvImport.jsp" />
+		</action>
 
+		<action path="/csvDomesticOrderStockListImport" type="jp.co.kts.ui.fileImport.CsvImportAction"
+			name="csvImportForm" scope="session" validate="false">
+			<set-property property="nonSecureAction" value="false" />
+			<set-property property="tokenType" value="nocheck" />
+			<forward name="success" path="/WEB-INF/page/import/domesticOrderStockCsvImport.jsp" />
+			<forward name="failure" path="/WEB-INF/page/import/domesticOrderStockCsvImport.jsp" />
+		</action>
+		
+		
 	</action-mappings>
 
 	<controller maxFileSize="250M"

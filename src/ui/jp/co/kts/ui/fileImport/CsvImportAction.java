@@ -37,6 +37,22 @@ public class CsvImportAction extends AppBaseAction{
 
 		CsvImportForm form = (CsvImportForm)appForm;
 
+		
+		if ("/initDomesticOrderStockCsvImport".equals(appMapping.getPath())) {
+			//国内注文入荷予定日取込 画面初期処理
+			return initDomesticOrderStockCsvImport(appMapping, form, request);
+		} 
+		
+		else if ("/domesticOrderStockCsvImport".equals(appMapping.getPath())) {
+			// 国内注文入荷予定日 データ取込（単一ファイル）
+			return domesticOrderStockCsvImport(appMapping, form, request);
+			
+		} else if("/csvDomesticOrderStockListImport".equals(appMapping.getPath())) {
+			// 国内注文入荷予定日 データ取込（複数ファイル）
+			return csvDomesticOrderStockListImport(appMapping, form, request);
+			
+		} 
+
 		//受注データ取込画面初期処理
 		if ("/initCsvImport".equals(appMapping.getPath())) {
 			return initCsvImport(appMapping, form, request);
@@ -903,5 +919,156 @@ public class CsvImportAction extends AppBaseAction{
 		return appMapping.findForward(StrutsBaseConst.FORWARD_NAME_SUCCESS);
 	}
 
+
+	
+	/**
+	 * 助ネコインポート：国内注文データ取込画面初期処理
+	 * @param appMapping
+	 * @param form
+	 * @param request
+	 * @return
+	 */
+	protected ActionForward initDomesticOrderStockCsvImport(AppActionMapping appMapping, CsvImportForm form,
+			HttpServletRequest request) throws Exception {
+		//エラーメッセージ初期化
+		form.setCsvErrorDTO(new ErrorDTO());
+		form.setCsvErrorList(new ArrayList<ErrorDTO>());
+		RegistryMessageDTO messageDTO = new RegistryMessageDTO();
+		//メッセージ初期化
+		form.setRegistryDto(messageDTO);
+		CorporationService corporationService = new CorporationService();
+
+		form.setCorporationId(0);
+		form.setCorporationList(corporationService.getCorporationList());
+
+		CsvImportService csvImportService = new CsvImportService();
+
+		form.setCsvInputList(csvImportService.initCsvInputList());
+
+		form.setAlertType("0");
+		return appMapping.findForward(StrutsBaseConst.FORWARD_NAME_SUCCESS);
+	}
+
+	/**
+	 * 助ネコインポート：国内注文データインポート処理
+	 * @param appMapping
+	 * @param form
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	protected ActionForward domesticOrderStockCsvImport(AppActionMapping appMapping, CsvImportForm form,
+            HttpServletRequest request) throws Exception {
+		RegistryMessageDTO messageDTO = new RegistryMessageDTO();
+
+		//エラーメッセージ初期化
+		form.setCsvErrorDTO(new ErrorDTO());
+		form.setCsvErrorList(new ArrayList<ErrorDTO>());
+
+		CsvImportService service = new CsvImportService();
+
+		begin();
+
+		form.setCsvErrorDTO(new ErrorDTO());
+
+		//CSVの情報をリストに格納
+		if (form.getCorporationId() != 0) {
+			form.setCsvErrorDTO(service.importDomesticFile(form.getCorporationId(), form.getFileUp(), form.getCsvImportList()));
+		}
+
+		// CSVファイルから国内注文書の作成
+		if (form.getCsvErrorDTO().isSuccess()) {
+
+			form.setCsvErrorDTO(service.csvToDomesticSlip(form.getCsvImportList()));
+			form.setTrueCount(form.getCsvErrorDTO().getTrueCount());
+		}
+
+		messageDTO.setMessageFlg("0");
+		messageDTO.setMessage("インポートが完了しました。");
+		form.setRegistryDto(messageDTO);
+		commit();
+		form.setAlertType(WebConst.ALERT_TYPE_REGIST);
+		return appMapping.findForward(StrutsBaseConst.FORWARD_NAME_SUCCESS);
+	}
+
+	/**
+	 * 助ネコインポート：国内注文データインポート処理(複数ファイル)
+	 * @param appMapping
+	 * @param form
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	private ActionForward csvDomesticOrderStockListImport(AppActionMapping appMapping,
+			CsvImportForm form, HttpServletRequest request) throws Exception {
+		RegistryMessageDTO messageDTO = new RegistryMessageDTO();
+		//エラーメッセージ初期化
+		form.setCsvErrorDTO(new ErrorDTO());
+		form.setCsvErrorList(new ArrayList<ErrorDTO>());
+
+		begin();
+
+		CsvImportService service = new CsvImportService();
+
+//		form.setCsvErrorList(service.importFileList(form.getCsvInputList(), form.getCsvImportList()));
+
+		long[] corporationIds = {0L, 0L, 0L, 0L, 0L, 0L};
+		int idx = 0;
+		//エラーチェック
+		for (CsvInputDTO dto: form.getCsvInputList()) {
+
+			if (StringUtils.isEmpty(dto.getFileUp().getFileName())) {
+				corporationIds[idx++] = 0L;
+				continue;
+			}
+
+			//ファイル会社名判定
+			corporationIds[idx] = service.getCorporationId(dto.getFileUp().getFileName());
+			if (corporationIds[idx++] == 0L) {
+				form.getCsvErrorList().add(service.getFileNmError(dto.getFileUp().getFileName()));
+				continue;
+			}
+		}
+
+		if (!service.isSuccess(form.getCsvErrorList())) {
+
+			rollback();
+			return appMapping.findForward(StrutsBaseConst.FORWARD_NAME_FAILURE);
+		}
+
+		//体裁が整っているかチェック
+		List<CsvInputDTO> checkedCsvInputList = new ArrayList<>();
+		form.setCsvErrorList(service.csvCheck(form.getCsvInputList(), checkedCsvInputList));
+
+		if (!service.isSuccess(form.getCsvErrorList())) {
+
+			rollback();
+			return appMapping.findForward(StrutsBaseConst.FORWARD_NAME_FAILURE);
+		}
+
+		//csvインポート
+		idx = 0;
+		for (CsvInputDTO dto: form.getCsvInputList()) {
+
+			form.getCsvErrorList().add(service.importDomesticFile(corporationIds[idx++], dto.getFileUp(),form.getCsvImportList()));
+		}
+
+		//国内注文書作成
+		SaleCsvService saleCsvService = new SaleCsvService();
+		List<List<CsvImportDTO>> csvImportLists = saleCsvService.csvToSaleSlipList(form.getCsvImportList());
+		for (List<CsvImportDTO> list: csvImportLists) {
+
+			ErrorDTO dto = service.csvToDomesticSlip(list);
+			form.getCsvErrorList().add(dto);
+			form.setTrueCount(dto.getTrueCount() + form.getTrueCount());
+		}
+
+		messageDTO.setMessageFlg("0");
+		messageDTO.setMessage("インポートが完了しました。");
+		form.setRegistryDto(messageDTO);
+		commit();
+		form.setAlertType(WebConst.ALERT_TYPE_REGIST);
+		return appMapping.findForward(StrutsBaseConst.FORWARD_NAME_SUCCESS);
+	}
 
 }
