@@ -1290,6 +1290,8 @@
 							<nested:write property="saleSlipNo" />
 							<nested:hidden property="sysCorporateSalesSlipId" styleClass="sysCorporateSalesSlipId_link"></nested:hidden>
 						</a>
+						<nested:hidden property="salesProfitRate" styleClass="salesProfitRate_link"></nested:hidden>
+						<nested:hidden property="purchaseProfitRate" styleClass="purchaseProfitRate_link"></nested:hidden>
 					</td>
 					<td><nested:write property="corporationNm" /></td>
 					<td><nested:write property="scheduledLeavingDate" /></td>

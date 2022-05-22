@@ -1598,7 +1598,6 @@ public class ItemDAO extends BaseDAO {
 		SQLParameters parameters = new SQLParameters();
 		UserInfo userInfo = ActionContext.getLoginUserInfo();
 		parameters.addParameter("updateUserId", userInfo.getUserId());
-		// speed up
 		//result = select("SELECT_PALLCALCASSEMBLYNUM", parameters, ResultSetHandlerFactory.getFirstColumnIntegerRowHandler());
 		result = select("SELECT_REBUILDASSEMBLYNUM", parameters, ResultSetHandlerFactory.getFirstColumnIntegerRowHandler());
 		return result;

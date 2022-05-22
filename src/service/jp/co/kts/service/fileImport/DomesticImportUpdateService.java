@@ -310,6 +310,7 @@ public class DomesticImportUpdateService extends DomesticExhibitionImportService
 				//if (dao.updateDomesticExhibition(domesticExhibitionDto) != RESULT_UPDATE_CNT){
 				//<---
 				System.out.println(( idx++) + " . Management Code : " + domesticExhibitionDto.getManagementCode());
+				// new update
 				if (dao.updateDomesticExhibitionByCode(domesticExhibitionDto) != RESULT_UPDATE_CNT){
 						dto.getResult().addErrorMessage("LED00116", domesticExhibitionDto.getManagementCode());
 				}

@@ -180,8 +180,16 @@ public class DomesticExhibitionDAO extends BaseDAO {
 		addParametersFromBeanProperties(dto, parameters);
 		UserInfo userInfo = ActionContext.getLoginUserInfo();
 		parameters.addParameter("updateUserId", userInfo.getUserId());
-
-		return update("UPD_DOMESTICEXHIBITION_BY_CODE", parameters);
+		int iRet = 0;
+		try
+		{
+			iRet = update("UPD_DOMESTICEXHIBITION_BY_CODE", parameters);
+		}
+		catch(Exception e)
+		{
+			System.out.println("UPD_DOMESTICEXHIBITION_BY_CODE : " + e.getMessage());
+		}
+		return iRet;
 	}
 	
 	public int updateItemCodeDomesticExhibition(DomesticExhibitionDTO dto) throws DaoException {

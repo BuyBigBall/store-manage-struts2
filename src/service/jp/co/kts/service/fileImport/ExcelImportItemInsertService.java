@@ -146,11 +146,9 @@ public class ExcelImportItemInsertService extends ExcelImportService {
 
 		List<List<String>> itemMstfoList = new ArrayList<List<String>>();
 		if (authInfo) {
-			//海外情報閲覧権限
 			//シート別にデータを取得。すべてString型で取得。
 			itemMstfoList = uploadExcelFile(wb, wb.getSheetAt(mstItemInfoSheetNmOn), ServiceConst.UPLOAD_EXCEL_ITEM_COLUMN);
 		} else {
-			// no 海外情報閲覧権限
 			//シート別にデータを取得。すべてString型で取得。
 			itemMstfoList = uploadExcelFile(wb, wb.getSheetAt(mstItemInfoSheetNmOff), ServiceConst.UPLOAD_EXCEL_NOT_AUTH_ITEM_COLUMN);
 		}
