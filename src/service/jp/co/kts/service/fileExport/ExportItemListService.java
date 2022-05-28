@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -858,7 +859,7 @@ public class ExportItemListService extends FileExportExcelService implements Aut
 	 * @throws DaoException
 	 * @throws ParseException
 	 */
-	public HSSFWorkbook getExportDoemsticExhibiti(DomesticExhibitionSearchDTO domesticSearchDTO, HSSFWorkbook workBook) throws DaoException, ParseException {
+	public HSSFWorkbook getExportDoemsticExhibiti(HttpServletRequest request, DomesticExhibitionSearchDTO domesticSearchDTO, HSSFWorkbook workBook) throws DaoException, ParseException {
 
 		HSSFSheet sheet = workBook.getSheetAt(0);
 		// シート名の設定.
@@ -867,6 +868,7 @@ public class ExportItemListService extends FileExportExcelService implements Aut
 
 		DomesticExhibitionDAO domesticExhibitionDao = new DomesticExhibitionDAO();
 		List<ExtendDomesticManageDTO> domesticList = domesticExhibitionDao.getDmstcExhbtnDwnLdLst(domesticSearchDTO);
+		//List<DomesticOrderListDTO> domesticList = (List<DomesticOrderListDTO>) (request.getSession()).getAttribute("getDomesticOrderItemIdList(DomesticOrderListDTO)");
 
 		//値の始まりの行
 		rowIdx = 1;
@@ -880,7 +882,7 @@ public class ExportItemListService extends FileExportExcelService implements Aut
 			}
 
 			colIdx = 0;
-
+			if(rowIdx>=65535) break;
 			//行の設定
 			row = sheet.getRow(rowIdx);
 			if (row == null) {
@@ -952,7 +954,7 @@ public class ExportItemListService extends FileExportExcelService implements Aut
 			}
 
 			colIdx = 0;
-
+			if(rowIdx>=65535) break;
 			//行の設定
 			row = sheet.getRow(rowIdx);
 			if (row == null) {

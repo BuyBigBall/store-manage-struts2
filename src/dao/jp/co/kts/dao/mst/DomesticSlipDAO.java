@@ -95,9 +95,11 @@ public class DomesticSlipDAO extends BaseDAO {
 		if (dto.getSysCorporationId() > 0) {
 			parameters.addParameter(("sysCorporationId"), dto.getSysCorporationId());
 		}
-
-		return selectList("SEL_DOMESTIC_ORDER_ITEM_ID", parameters,
-				ResultSetHandlerFactory.getNameMatchBeanRowHandler(DomesticOrderListDTO.class));
+		
+		
+		List<DomesticOrderListDTO> ret = selectList("SEL_DOMESTIC_ORDER_ITEM_ID", parameters,
+				ResultSetHandlerFactory.getNameMatchBeanRowHandler(DomesticOrderListDTO.class));; 
+		return ret;
 	}
 
 
